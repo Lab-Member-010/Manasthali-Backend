@@ -1,13 +1,20 @@
 import mongoose from 'mongoose';
 
 const leaderboardSchema = new mongoose.Schema({
-  type: String,
+    leaderboardId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        unique: true,
+        auto: true     
+    },
+ durationtype: String,//eg weekly,monthly
   rankings: [{
-    user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User  ' },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     points: Number,
     rank: Number
   }],
-  creation_date: { type: Date, default: Date.now }
+}, {
+    timestamps: true 
 });
 
 export default mongoose.model('Leaderboard', leaderboardSchema);

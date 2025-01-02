@@ -1,4 +1,4 @@
-import Story from './story.model.js';
+import Story from '../model/story.model.js';
 
 // Upload a new story
 export const uploadStory = async (req, res) => {

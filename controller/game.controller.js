@@ -1,4 +1,4 @@
-import Game from './game.model.js';
+import Game from '../model/game.model.js';
 
 // Get a list of all games
 export const getAllGames = async (req, res) => {

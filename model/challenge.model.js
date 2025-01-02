@@ -1,9 +1,16 @@
 import mongoose from 'mongoose';
 
 const challengeSchema = new mongoose.Schema({
-  personalityType: String,
-  challenge: String,
-  creation_date: { type: Date, default: Date.now }
+    challengeId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        unique: true,
+        auto: true     
+    },
+  personalityType: { type:String,required:true},
+  challenge:{type: String,required:true}
+}, {
+    timestamps: true 
 });
 
 export default mongoose.model('Challenge', challengeSchema);

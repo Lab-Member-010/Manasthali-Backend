@@ -1,4 +1,4 @@
-import Community from './community.model.js';
+import Community from '../model/community.model.js';
 
 // Get all communities
 export const getAllCommunities = async (req, res) => {

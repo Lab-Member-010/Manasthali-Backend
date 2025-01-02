@@ -1,12 +1,19 @@
 import mongoose from 'mongoose';
 
 const notificationSchema = new mongoose.Schema({
-  user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User  ' },
+    notificationId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        unique: true,
+        auto: true     
+    },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   type: String,
-  sender_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User  ' },
-  content: String,
-  read_status: { type: Boolean, default: false },
-  creation_date_time: { type: Date, default: Date.now }
+  sender_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  content: {type:String,required:true},
+  read_status: { type: Boolean, default: false }
+}, {
+    timestamps: true 
 });
 
 export default mongoose.model('Notification', notificationSchema);

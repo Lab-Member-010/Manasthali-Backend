@@ -1,4 +1,4 @@
-import Quiz from './quiz.model.js';
+import Quiz from '../model/quiz.model.js';
 
 export const submitQuiz = async (req, res) => {
   // Logic to save quiz answers and calculate personality type

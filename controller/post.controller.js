@@ -1,4 +1,4 @@
-import Post from './post.model.js';
+import Post from '../model/post.model.js';
 
 // Create a new post
 export const createPost = async (req, res) => {

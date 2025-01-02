@@ -1,17 +1,24 @@
 import mongoose from 'mongoose';
 
 const mentalCoachSchema = new mongoose.Schema({
-  user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User  ' },
-  coach_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User  ' },
+    interectionId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        unique: true,
+        auto: true     
+    },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  coachId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   topic: String,
   conversation: [{
-    sender: String,
-    message: String,
+    sender:{type: String,required:true},
+    message:{type: String,required:true},
     timestamp: { type: Date, default: Date.now }
   }],
-  resolution_status: { type: String, enum: ['open', 'resolved'] },
-  creation_date: { type: Date, default: Date.now },
-  last_updated: { type: Date, default: Date.now }
+  resolution_status: { type: String, enum: ['open', 'resolved']}
+ 
+}, {
+    timestamps: true 
 });
 
 export default mongoose.model('MentalCoach', mentalCoachSchema);
