@@ -1,4 +1,4 @@
-import Badge from './badge.model.js';
+import Badge from '../model/badge.model.js';
 
 // Get a list of badges earned by a user
 export const getUserBadges = async (req, res) => {
