@@ -3,9 +3,7 @@ import mongoose from 'mongoose';
 const communitySchema = new mongoose.Schema({
     communityId: {
         type: mongoose.Schema.Types.ObjectId,
-        required: true,
-        unique: true,
-        auto: true     
+        required: true    
     },
   name: {type:String,required:true,unique:true},
   description: String,

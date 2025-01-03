@@ -1,12 +1,7 @@
 import mongoose from "mongoose";
 
 const quizSchema = new mongoose.Schema({
-  quizId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    unique: true,
-    auto: true,
-  },
+ 
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   quiz_attempt: { type: Number, default: 1 },
   answers: [

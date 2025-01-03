@@ -1,12 +1,7 @@
 import mongoose from 'mongoose';
 
 const mentalCoachSchema = new mongoose.Schema({
-    interectionId: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
-        unique: true,
-        auto: true     
-    },
+   
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   coachId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   topic: String,
