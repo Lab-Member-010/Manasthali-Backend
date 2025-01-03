@@ -1,12 +1,7 @@
 import mongoose from 'mongoose';
 
 const postSchema = new mongoose.Schema({
-    postId: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
-        unique: true,
-        auto: true     
-    },
+   
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   media: [{type:String,required:true}],
   description: String,
