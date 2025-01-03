@@ -1,4 +1,4 @@
-import MentalCoach from './mentalCoach.model.js';
+import MentalCoach from '../model/mentalCoach.model.js';
 
 // Start a new session with the mental coach
 export const startSession = async (req, res) => {

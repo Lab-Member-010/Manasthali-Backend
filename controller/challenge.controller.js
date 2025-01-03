@@ -1,4 +1,4 @@
-import Challenge from './challenge.model.js';
+import Challenge from '../model/challenge.model.js';
 
 // Get daily challenges for a specific personality type
 export const getDailyChallenges = async (req, res) => {

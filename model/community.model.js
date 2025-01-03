@@ -1,13 +1,20 @@
 import mongoose from 'mongoose';
 
 const communitySchema = new mongoose.Schema({
-  name: String,
+    communityId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        unique: true,
+        auto: true     
+    },
+  name: {type:String,required:true,unique:true},
   description: String,
   icon: String,
   personality_type: String,
   created_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User ' },
-  group_count: { type: Number, default: 0 },
-  creation_date: { type: Date, default: Date.now }
+  group_count: { type: Number, default: 0}
+}, {
+    timestamps: true 
 });
 
 export default mongoose.model('Community', communitySchema);

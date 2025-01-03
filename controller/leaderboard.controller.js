@@ -1,4 +1,4 @@
-import Leaderboard from './leaderboard.model.js';
+import Leaderboard from '../model/leaderboard.model.js';
 
 // Get the current leaderboard
 export const getCurrentLeaderboard = async (req, res) => {

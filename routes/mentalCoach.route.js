@@ -1,5 +1,5 @@
 import express from 'express';
-import { startSession, getSessionDetails, sendMessage, resolveSession } from './mentalCoach.controller.js';
+import { startSession, getSessionDetails, sendMessage, resolveSession } from '../controller/mentalCoach.controller.js';
 
 const router = express.Router();
 

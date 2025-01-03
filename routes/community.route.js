@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllCommunities, getCommunityDetails, getGroupsInCommunity, createCommunity } from './community.controller.js';
+import { getAllCommunities, getCommunityDetails, getGroupsInCommunity, createCommunity } from '../controller/community.controller.js';
 
 const router = express.Router();
 
