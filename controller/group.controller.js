@@ -5,26 +5,26 @@ import Community from '../model/community.model.js';
 export const createGroup = async (req, res) => {
   // Logic to create a new group
   const { name, description, communityId } = req.body;
-  console.log(req.body);
-  // Check if user is authenticated (assuming authentication middleware)
+
+  // Check if user is authenticated (req.user is populated by the auth middleware)
   if (!req.user) {
-    return res.status(401).json({ message: 'Unauthorized' });
+    return res.status(401).json({ message: "Unauthorized" });
   }
 
-  const createdBy = req.user._id; // Get user ID from authentication
+  const createdBy = req.user.id; // Get user ID from decoded token
 
-  // Check if community exists (if applicable)
+  // Check if community exists (if a communityId is provided)
   if (communityId) {
     const community = await Community.findById(communityId);
     if (!community) {
-      return res.status(400).json({ message: 'Community not found' });
+      return res.status(400).json({ message: "Community not found" });
     }
   }
 
   // Check for duplicate group name
   const existingGroup = await Group.findOne({ name });
   if (existingGroup) {
-    return res.status(400).json({ message: 'Group with that name already exists' });
+    return res.status(400).json({ message: "Group with that name already exists" });
   }
 
   try {
@@ -33,7 +33,7 @@ export const createGroup = async (req, res) => {
     res.status(201).json(newGroup);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Internal Server Error' });
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
@@ -43,13 +43,14 @@ export const getGroupDetails = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const group = await Group.findById(id).populate('members createdBy communityId'); // Populate related data
+    const group = await Group.findById(id).populate('communityId'); // Populate related data
     if (!group) {
       return res.status(404).json({ message: 'Group not found' });
     }
     res.json(group);
   } catch (err) {
-    handleErrors(err, req, res);
+     console.log(err);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
@@ -68,7 +69,8 @@ export const updateGroup = async (req, res) => {
     }
     res.json(group);
   } catch (err) {
-    handleErrors(err, req, res);
+    console.log(err.message);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
@@ -85,7 +87,8 @@ export const deleteGroup = async (req, res) => {
     }
     res.json({ message: 'Group deleted' });
   } catch (err) {
-    handleErrors(err, req, res);
+    console.log(err.message);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
@@ -95,7 +98,10 @@ export const joinGroup = async (req, res) => {
   try {
     const { id } = req.params; // Group ID from the URL
     const userId = req.user._id; // User ID from authentication middleware
-
+    console.log(req.params);
+    console.log(req.user._id);
+    
+    
     // Find the group by ID
     const group = await Group.findById(id);
     if (!group) {
