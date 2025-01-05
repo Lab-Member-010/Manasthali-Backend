@@ -2,7 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import badgeRouter from "./routes/badge.route.js";
-import challangeRouter from "./routes/challenge.route.js";
+import challengeRouter from "./routes/challenge.route.js";
 import commentRouter from "./routes/comment.route.js";
 import communityRouter from "./routes/community.route.js";
 import gameRouter from "./routes/game.route.js";
@@ -22,9 +22,9 @@ mongoose.connect("mongodb://127.0.0.1:27017/mitraDb")
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
 
-    app.use("/challanges", challangeRouter);
+    app.use("/challenges", challengeRouter);
     app.use("/comments", commentRouter);
-    app.use("/communitys", communityRouter);
+    app.use("/communities", communityRouter);
     app.use("/games", gameRouter);
     app.use("/groups", groupRouter);
     app.use("/leaderboards", leaderboardRouter);
