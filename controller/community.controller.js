@@ -3,7 +3,6 @@ import Group from '../model/group.model.js';
 
 // Get all communities
 export const getAllCommunities = async (req, res) => {
-  // Logic to fetch all communities
   try {
     const communities = await Community.find();
     res.status(200).json(communities);
@@ -15,7 +14,6 @@ export const getAllCommunities = async (req, res) => {
 
 // Get community details
 export const getCommunityDetails = async (req, res) => {
-  // Logic to fetch community details by ID
   try {
     const { id } = req.params;
     const community = await Community.findById(id);
@@ -31,7 +29,6 @@ export const getCommunityDetails = async (req, res) => {
 
 // Get groups in community
 export const getGroupsInCommunity = async (req, res) => {
-  // Logic to fetch groups in a community
   try {
     const { id } = req.params;
     const groups = await Group.find({ communityId: id });
@@ -47,7 +44,6 @@ export const getGroupsInCommunity = async (req, res) => {
 
 // Create a new community
 export const createCommunity = async (req, res) => {
-  // Logic to create a new community
   const { communityId, name, description, icon, personality_type, created_by } = req.body;
 
   // Check for duplicate community name

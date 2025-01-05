@@ -22,6 +22,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/mitraDb")
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
 
+
     app.use("/challenges", challengeRouter);
     app.use("/comments", commentRouter);
     app.use("/communities", communityRouter);
@@ -41,4 +42,8 @@ mongoose.connect("mongodb://127.0.0.1:27017/mitraDb")
     });
 }).catch(err => {
     console.log(err);
+});
+app.use((req, res, next) => {
+    console.log(`Unhandled route: ${req.method} ${req.url}`);
+    res.status(404).send("Route not found");
 });

@@ -17,7 +17,7 @@ export const auth = async (req, res, next) => {
     // Verify the token
     const decoded = jwt.verify(
       token,
-      "fdfjfjrwieroerivxcnmvnnvrweiorddfsdfdlkfjlfjljlraj" // Your secret key
+      "fdfjfjrwieroerivxcnmvnnvrweiorddfsdfdlkfjlfjljlraj" //secret key
     );
 
     // Attach the user data to the request object

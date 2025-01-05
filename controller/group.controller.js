@@ -3,7 +3,6 @@ import Community from '../model/community.model.js';
 
 // Create a new group
 export const createGroup = async (req, res) => {
-  // Logic to create a new group
   const { name, description, communityId } = req.body;
 
   // Check if user is authenticated (req.user is populated by the auth middleware)
@@ -39,7 +38,6 @@ export const createGroup = async (req, res) => {
 
 // Get group details
 export const getGroupDetails = async (req, res) => {
-  // Logic to fetch group details by ID
   const { id } = req.params;
 
   try {
@@ -56,12 +54,10 @@ export const getGroupDetails = async (req, res) => {
 
 // Update group details
 export const updateGroup = async (req, res) => {
-  // Logic to update group details
   const { id } = req.params;
   const { name, description, communityId } = req.body;
 
   // Check if user is authorized to update (e.g., creator or admin)
-
   try {
     const group = await Group.findByIdAndUpdate(id, { name, description, communityId }, { new: true }); // Return updated document
     if (!group) {
@@ -76,10 +72,8 @@ export const updateGroup = async (req, res) => {
 
 // Delete a group
 export const deleteGroup = async (req, res) => {
-  // Logic to delete a group
   const { id } = req.params;
   // Check if user is authorized to delete (e.g., creator or admin)
-
   try {
     const deletedGroup = await Group.findByIdAndDelete(id);
     if (!deletedGroup) {
@@ -94,14 +88,12 @@ export const deleteGroup = async (req, res) => {
 
 // Join a group
 export const joinGroup = async (req, res) => {
-  // Logic to join a group
   try {
     const { id } = req.params; // Group ID from the URL
     const userId = req.user._id; // User ID from authentication middleware
     console.log(req.params);
     console.log(req.user._id);
-    
-    
+
     // Find the group by ID
     const group = await Group.findById(id);
     if (!group) {
@@ -113,7 +105,6 @@ export const joinGroup = async (req, res) => {
       group.members.push(userId);
       await group.save();
     }
-
     res.status(200).json({ message: 'Successfully joined the group', group });
   } catch (err) {
     console.error(err.message);
@@ -121,10 +112,8 @@ export const joinGroup = async (req, res) => {
   }
 };
 
-
 // Leave a group
 export const leaveGroup = async (req, res) => {
-  // Logic to leave a group
   try {
     const { id } = req.params; // Group ID from the URL
     const userId = req.user._id; // User ID from authentication middleware
@@ -138,7 +127,6 @@ export const leaveGroup = async (req, res) => {
     // Remove the user from the group members list
     group.members = group.members.filter(memberId => memberId.toString() !== userId.toString());
     await group.save();
-
     res.status(200).json({ message: 'Successfully left the group', group });
   } catch (err) {
     console.error(err.message);
@@ -148,7 +136,6 @@ export const leaveGroup = async (req, res) => {
 
 // Get group members
 export const getGroupMembers = async (req, res) => {
-// Logic to fetch group members
   try {
     const { id } = req.params; // Group ID from the URL
     // Find the group by ID and populate the members field
