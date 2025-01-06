@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { myOPT } from "../mailer/mymail.js"; 
 
+//sign-up
 export const SignUp = async (request, response, next) => {
     try {
         // Validate request body using express-validator
@@ -139,7 +140,7 @@ export const resetPassword = async (req, res) => {
     }
 };
 
-
+//sign-in
 export const SignIn = async (request, response, next) => {
     try {
         let { email, password } = request.body;
@@ -160,11 +161,13 @@ export const SignIn = async (request, response, next) => {
     }
 };
 
+//generate json webtoken
 const generateToken = (userId) => {
     let token = jwt.sign({ payload: userId }, "youwillgavefun");
     return token;
 };
 
+//get user profile
 export const getUserById = async (req, res) => {
     try {
         const user = await User.findOne({ userId: req.params.id });
@@ -180,6 +183,7 @@ export const getUserById = async (req, res) => {
     }
 };
 
+//update user profile
 export const updateUserById = async (req, res) => {
     try {
         const updatedUser = await User.findOneAndUpdate(
@@ -202,6 +206,7 @@ export const updateUserById = async (req, res) => {
     }
 };
 
+//delete user
 export const deleteUserById = async (req, res) => {
     try {
         const deletedUser = await User.findOneAndDelete({ userId: req.params.id });
@@ -217,6 +222,7 @@ export const deleteUserById = async (req, res) => {
     }
 };
 
+//get list of all followers
 export const getUserFollowers = async (req, res) => {
     try {
         const user = await User.findOne({ userId: req.params.id }).populate(
@@ -235,6 +241,7 @@ export const getUserFollowers = async (req, res) => {
     }
 };
 
+//get list of all following
 export const getUserFollowing = async (req, res) => {
     try {
         const user = await User.findOne({ userId: req.params.id }).populate(
@@ -253,6 +260,7 @@ export const getUserFollowing = async (req, res) => {
     }
 };
 
+//follow user
 export const followUser = async (req, res) => {
     try {
         const currentUser = await User.findById(req.user.payload); 
@@ -279,6 +287,7 @@ export const followUser = async (req, res) => {
     }
 };
 
+//unfollow user
 export const unfollowUser = async (req, res) => {
     try {
         const currentUser = await User.findById(req.user.payload);
