@@ -1,19 +1,8 @@
-// user.controller.js
-
 import { validationResult } from "express-validator";
 import { User } from "../model/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
 import crypto from "crypto";
-
-const transporter = nodemailer.createTransport({
-  service: "Gmail",
-  auth: {
-    user: "sharmajayesh085@gmail.com", // Use environment variables in production
-    pass: "Turt11it",
-  },
-});
 
 export const SignIn = async (request, response, next) => {
     try {

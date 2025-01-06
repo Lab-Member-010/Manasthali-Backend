@@ -37,13 +37,18 @@ mongoose.connect("mongodb://127.0.0.1:27017/mitraDb")
     app.use("/badges", badgeRouter);
     app.use("/users", userRouter);
 
+
+    app.get("/",(req,res)=>{
+        res.end("done")
+    })
+    app.use((req, res, next) => {
+        console.log(`Unhandled route: ${req.method} ${req.url}`);
+        res.status(404).send("Route not found");
+    });
+
     app.listen(3001, () => {
         console.log("Server Started....");
     });
 }).catch(err => {
     console.log(err);
-});
-app.use((req, res, next) => {
-    console.log(`Unhandled route: ${req.method} ${req.url}`);
-    res.status(404).send("Route not found");
 });
