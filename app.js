@@ -13,15 +13,15 @@ import notificationRouter from "./routes/notification.route.js";
 import postRouter from "./routes/post.route.js";
 import quizRouter from "./routes/quiz.route.js";
 import storyRouter from "./routes/story.route.js";
-import userRouter from "./routes/user.route.js";
+import userRouter from "./routes/user.route.js"; // Import your user router
 
 const app = express();
+
 mongoose.connect("mongodb://127.0.0.1:27017/mitraDb")
-.then(() => {
+  .then(() => {
     console.log("Database connected...");
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
-
 
     app.use("/challenges", challengeRouter);
     app.use("/comments", commentRouter);
