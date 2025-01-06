@@ -8,7 +8,9 @@ import {
   getUserFollowers,
   getUserFollowing,
   followUser,
-  unfollowUser
+  unfollowUser,
+  // sendfollowrequest,
+  // handelrequest
 } from "../controller/user.controller.js";
 import { body } from "express-validator";
 import { auth } from "../middleware/auth.js";
@@ -47,7 +49,8 @@ router.get("/:id/following", auth, getUserFollowing);
 // Follow a user
 router.post("/:id/follow", auth, followUser);
 
-// Unfollow a user
+ 
 router.post("/:id/unfollow", auth, unfollowUser);
-
+// router.post("/follow-request",auth,sendfollowrequest);
+// router.post("/follow-request/handel",auth,handelrequest);
 export default router;

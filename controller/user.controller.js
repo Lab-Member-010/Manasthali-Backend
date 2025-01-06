@@ -70,11 +70,9 @@ export const updateUserById = async (req, res) => {
             req.body,
             { new: true }
         );
-
         if (!updatedUser) {
             return res.status(404).json({ error: "User not found" });
         }
-
         return res.status(200).json({
             message: "User updated successfully",
             user: updatedUser,
@@ -166,21 +164,17 @@ export const unfollowUser = async (req, res) => {
     try {
         const currentUser = await User.findById(req.user.payload);
         const targetUser = await User.findById(req.params.id);
-
         if (!currentUser || !targetUser) {
             return res.status(404).json({ error: "User not found" });
         }
-
         currentUser.following = currentUser.following.filter(
             (id) => id.toString() !== targetUser._id.toString()
         );
         await currentUser.save();
-
         targetUser.followers = targetUser.followers.filter(
             (id) => id.toString() !== currentUser._id.toString()
         );
         await targetUser.save();
-
         return res.status(200).json({ message: "User unfollowed successfully" });
     } catch (err) {
         console.error(err);

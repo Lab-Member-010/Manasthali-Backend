@@ -1,16 +1,20 @@
 import mongoose from "mongoose";
 
 const storySchema = new mongoose.Schema({
- 
-
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  media: [{type:String,required:true,}],
-  caption: { type:String},
+  media: [{ type: String, required: true, }],
+  caption: String,
   views: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-  upload_date_time: { type: Date, default: Date.now },
-  end_date_time: { type: Date },
+  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  comments: [
+    {
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+      text: { type: String },
+    },
+  ],
+  upload_date_time: { type: Date, default: Date.now }
 }, {
-    timestamps: true 
+  timestamps: true
 });
 
 export default mongoose.model("Story", storySchema);
