@@ -2,8 +2,7 @@ import mongoose from 'mongoose';
 
 const communitySchema = new mongoose.Schema({
     communityId: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true
+        type: mongoose.Schema.Types.ObjectId
     },
     name: { type: String, required: true, unique: true },
     description: String,

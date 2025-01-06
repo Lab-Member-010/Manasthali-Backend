@@ -1,7 +1,6 @@
 import Post from "../model/post.model.js";
 import Comment from "../model/comment.model.js";
 
-// Create a new post
 export const createPost = async (request, response, next) => {
   try {
     let { userId, media } = request.body;
@@ -136,8 +135,9 @@ export const unlikePost = async (request, response, next) => {
   }
 };
 
-// Get comments on a post
+
 export const getPostComments = async (request, response, next) => {
+
   // Logic to fetch comments on a post
   try {
     const { id } = request.params;
@@ -189,4 +189,4 @@ export const sharePost = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: " internal Server error" });
   }
-};
+}; 

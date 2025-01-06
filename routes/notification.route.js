@@ -1,8 +1,8 @@
 import express from 'express';
-import { getUserNotifications, markNotificationAsRead } from '../controller/notification.controller.js';
+import {sendNotification, getUserNotifications, markNotificationAsRead } from '../controller/notification.controller.js';
 
 const router = express.Router();
-
+router.post('/notifications/send',sendNotification);
 router.get('/notifications/:userId', getUserNotifications);
 router.put('/notifications/:id/mark-read', markNotificationAsRead);
 

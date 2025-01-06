@@ -8,7 +8,10 @@ import {
   getUserFollowers,
   getUserFollowing,
   followUser,
-  unfollowUser
+  unfollowUser,
+  verifyOtp,
+  forgotPassword,
+  resetPassword,
 } from "../controller/user.controller.js";
 import { body } from "express-validator";
 import { auth } from "../middleware/auth.js";
@@ -26,8 +29,28 @@ router.post(
   SignUp
 );
 
+// Verify OTP
+router.post("/verify-otp", 
+  body("email", "Invalid email ID").isEmail(),
+  body("otp", "OTP is required").notEmpty(),
+  verifyOtp
+);
+
 // Authenticate and log in a user
 router.post("/login", SignIn);
+
+// Forgot password
+router.post("/forgot-password", 
+  body("email", "Invalid email ID").isEmail(),
+  forgotPassword
+);
+
+// Reset password
+router.post("/reset-password", 
+  body("token", "Token is required").notEmpty(),
+  body("newPassword", "New password is required").notEmpty(),
+  resetPassword
+);
 
 // Get user details by ID
 router.get("/:id", auth, getUserById);
@@ -47,7 +70,8 @@ router.get("/:id/following", auth, getUserFollowing);
 // Follow a user
 router.post("/:id/follow", auth, followUser);
 
-// Unfollow a user
+ 
 router.post("/:id/unfollow", auth, unfollowUser);
-
+// router.post("/follow-request",auth,sendfollowrequest);
+// router.post("/follow-request/handel",auth,handelrequest);
 export default router;

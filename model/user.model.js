@@ -57,7 +57,7 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     country: {
-      type: String
+      type: String,
     },
     age: {
       type: Number,
@@ -76,12 +76,16 @@ const userSchema = new mongoose.Schema(
       profile_visibility: {
         type: String,
         enum: ["public", "private"],
-      }
+      },
     },
     isActive: {
       type: Boolean,
       default: true,
     },
+    verified: { type: Boolean, default: false },
+    otp: { type: String },
+    resetToken: { type: String },
+    resetTokenExpiry: { type: Date }
   },
   {
     timestamps: true,
