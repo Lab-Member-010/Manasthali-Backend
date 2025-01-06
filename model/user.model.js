@@ -82,25 +82,14 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    // New fields for OTP and password reset
-    otp: {
-      type: String, // Stores the OTP for email verification
-      default: null,
-    },
-    resetToken: {
-      type: String, // Stores the token for password reset
-      default: null,
-    },
+    verified: { type: Boolean, default: false },
+    otp: { type: String },
+    resetToken: { type: String },
+    resetTokenExpiry: { type: Date }
   },
   {
     timestamps: true,
   }
 );
-
-// TTL Index for OTP: Automatically expires after 5 minutes
-userSchema.index({ otp: 1 }, { expireAfterSeconds: 300 }); 
-
-// TTL Index for Reset Token: Automatically expires after 1 hour
-userSchema.index({ resetToken: 1 }, { expireAfterSeconds: 3600 }); 
 
 export const User = mongoose.model("User", userSchema);
