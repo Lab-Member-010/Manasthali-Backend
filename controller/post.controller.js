@@ -31,7 +31,7 @@ export const unlikePost = async (req, res) => {
 };
 
 // Get comments on a post
-export const getPostComments = async (req, res) => {
+export const getPostComments = async(req, res) => {
   // Logic to fetch comments on a post
 };
 
