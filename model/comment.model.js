@@ -1,11 +1,6 @@
 import mongoose from 'mongoose';
 
 const commentSchema = new mongoose.Schema({
-    comment_id: {
-        type: String,
-        required: true,
-        unique: true
-    },
     post_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Post',
@@ -29,8 +24,8 @@ const commentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }]
-},{
-    timestamps: true 
+}, {
+    timestamps: true
 });
 
 export default mongoose.model('Comment', commentSchema);

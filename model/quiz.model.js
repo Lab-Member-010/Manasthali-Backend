@@ -1,14 +1,12 @@
 import mongoose from "mongoose";
 
 const quizSchema = new mongoose.Schema({
- 
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   quiz_attempt: { type: Number, default: 1 },
   answers: [
     {
       question_id: String,
-
-      answer: {type:Number,required:true}
+      answer: { type: Number, required: true }
     },
   ],
   scores: {
@@ -21,7 +19,7 @@ const quizSchema = new mongoose.Schema({
   community_id: { type: mongoose.Schema.Types.ObjectId, ref: "Community" },
   result_date: { type: Date, default: Date.now }
 }, {
-    timestamps: true 
+  timestamps: true
 });
 
 export default mongoose.model("Quiz", quizSchema);

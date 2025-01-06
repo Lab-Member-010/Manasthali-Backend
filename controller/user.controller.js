@@ -1,16 +1,152 @@
-// user.controller.js
 import { validationResult } from "express-validator";
 import { User } from "../model/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { myOPT } from "../mailer/mymail.js"; 
 
+//sign-up
+export const SignUp = async (request, response, next) => {
+    try {
+        // Validate request body using express-validator
+        const errors = validationResult(request);
+        if (!errors.isEmpty()) {
+            console.error("Validation errors:", errors.array());
+            return response.status(400).json({ error: "Bad request", details: errors.array() });
+        }
+
+        const { email, password, username, contact,dob, gender } = request.body;
+
+        // Check if email already exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            console.error(`Email already exists: ${email}`);
+            return response.status(409).json({ error: "Email already exists" });
+        }
+
+        // Generate OTP
+        const otp = myOPT(email);
+
+        // Encrypt password
+        const saltKey = bcrypt.genSaltSync(10);
+        const encryptedPassword = bcrypt.hashSync(password, saltKey);
+
+        // Create a new user with `verified` set to false
+        const user = new User({
+            email,
+            username,
+            contact,
+            dob,
+            gender,
+            password: encryptedPassword,
+            otp,
+            verified: false,
+        });
+        await user.save();
+
+        // Return success response
+        return response.status(201).json({
+            message: "Sign up success. OTP sent to your email.",
+            user: { id: user.id, email: user.email, username: user.username }, // Send only safe data
+        });
+    } catch (err) {
+        console.error("Unexpected error during SignUp process:", err);
+        return response.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+// Verify OTP
+export const verifyOtp = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+
+        const user = await User.findOne({ email, otp });
+        if (!user) {
+            return res.status(400).json({ error: "Invalid OTP" });
+        }
+
+        user.verified = true; 
+        user.otp = null;
+        await user.save();
+
+        res.status(200).json({ message: "OTP verified successfully. Your account is now active." });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+// Forgot Password
+export const forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Generate a reset token and set its expiry time (optional)
+        const token = crypto.randomBytes(32).toString("hex");
+        user.resetToken = token;
+        user.resetTokenExpiry = Date.now() + 3600000; // Token valid for 1 hour
+        await user.save();
+
+        // Send reset link to user's email
+        const resetLink = `http://localhost:3000/reset-password/${token}`;
+        await transporter.sendMail({
+            from: "your-email@gmail.com",
+            to: email,
+            subject: "Password Reset",
+            html: `<p>Click the link below to reset your password:</p>
+                   <a href="${resetLink}">${resetLink}</a>`,
+        });
+
+        res.status(200).json({ message: "Password reset link sent successfully" });
+    } catch (err) {
+        console.error("Error in forgotPassword:", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+// Reset Password
+export const resetPassword = async (req, res) => {
+    try {
+        const { token, newPassword } = req.body;
+
+        // Find the user with the provided reset token and ensure it is not expired
+        const user = await User.findOne({
+            resetToken: token,
+            resetTokenExpiry: { $gt: Date.now() }, // Ensure token is still valid
+        });
+
+        if (!user) {
+            return res.status(400).json({ error: "Invalid or expired reset token" });
+        }
+
+        // Encrypt the new password
+        const saltKey = bcrypt.genSaltSync(10);
+        const encryptedPassword = bcrypt.hashSync(newPassword, saltKey);
+
+        // Update user's password and clear the reset token and expiry
+        user.password = encryptedPassword;
+        user.resetToken = null;
+        user.resetTokenExpiry = null;
+        await user.save();
+
+        res.status(200).json({ message: "Password reset successfully" });
+    } catch (err) {
+        console.error("Error in resetPassword:", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+//sign-in
 export const SignIn = async (request, response, next) => {
     try {
         let { email, password } = request.body;
         let user = await User.findOne({ email });
         if (user) {
             let status = bcrypt.compareSync(password, user.password);
-            
             if(status){
                 return response.status(200).json({message: "Sign in success..",user,token: generateToken(user.userId)});
             }else{
@@ -25,29 +161,13 @@ export const SignIn = async (request, response, next) => {
     }
 };
 
-export const SignUp = async (request, response, next) => {
-    try {
-        const errors = validationResult(request);
-        if (!errors.isEmpty())
-            return response.status(401).json({ error: "Bad request" });
-
-        let saltKey = bcrypt.genSaltSync(10);
-        let encryptedPassword = bcrypt.hashSync(request.body.password, saltKey);
-        request.body.password = encryptedPassword;
-
-        let user = await User.create(request.body);
-        return response.status(201).json({ message: "Sign up success", user });
-    } catch (err) {
-        console.log(err);
-        return response.status(500).json({ error: "Internal Server Error" });
-    }
-};
-
+//generate json webtoken
 const generateToken = (userId) => {
     let token = jwt.sign({ payload: userId }, "youwillgavefun");
     return token;
 };
 
+//get user profile
 export const getUserById = async (req, res) => {
     try {
         const user = await User.findOne({ userId: req.params.id });
@@ -63,6 +183,7 @@ export const getUserById = async (req, res) => {
     }
 };
 
+//update user profile
 export const updateUserById = async (req, res) => {
     try {
         const updatedUser = await User.findOneAndUpdate(
@@ -83,6 +204,7 @@ export const updateUserById = async (req, res) => {
     }
 };
 
+//delete user
 export const deleteUserById = async (req, res) => {
     try {
         const deletedUser = await User.findOneAndDelete({ userId: req.params.id });
@@ -98,6 +220,7 @@ export const deleteUserById = async (req, res) => {
     }
 };
 
+//get list of all followers
 export const getUserFollowers = async (req, res) => {
     try {
         const user = await User.findOne({ userId: req.params.id }).populate(
@@ -116,6 +239,7 @@ export const getUserFollowers = async (req, res) => {
     }
 };
 
+//get list of all following
 export const getUserFollowing = async (req, res) => {
     try {
         const user = await User.findOne({ userId: req.params.id }).populate(
@@ -134,6 +258,7 @@ export const getUserFollowing = async (req, res) => {
     }
 };
 
+//follow user
 export const followUser = async (req, res) => {
     try {
         const currentUser = await User.findById(req.user.payload); 
@@ -160,6 +285,7 @@ export const followUser = async (req, res) => {
     }
 };
 
+//unfollow user
 export const unfollowUser = async (req, res) => {
     try {
         const currentUser = await User.findById(req.user.payload);
