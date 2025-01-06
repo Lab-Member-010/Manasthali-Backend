@@ -13,7 +13,7 @@ export const SignUp = async (request, response, next) => {
             return response.status(400).json({ error: "Bad request", details: errors.array() });
         }
 
-        const { email, password, username, contact } = request.body;
+        const { email, password, username, contact,dob, gender } = request.body;
 
         // Check if email already exists
         const existingUser = await User.findOne({ email });
@@ -34,6 +34,8 @@ export const SignUp = async (request, response, next) => {
             email,
             username,
             contact,
+            dob,
+            gender,
             password: encryptedPassword,
             otp,
             verified: false,
@@ -61,8 +63,8 @@ export const verifyOtp = async (req, res) => {
             return res.status(400).json({ error: "Invalid OTP" });
         }
 
-        user.verified = true; // Mark user as verified
-        user.otp = null; // Clear OTP after verification
+        user.verified = true; 
+        user.otp = null;
         await user.save();
 
         res.status(200).json({ message: "OTP verified successfully. Your account is now active." });
