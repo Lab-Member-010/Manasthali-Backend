@@ -81,14 +81,15 @@ const userSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true,
-    }
+    },
+    verified: { type: Boolean, default: false },
+    otp: { type: String },
+    resetToken: { type: String },
+    resetTokenExpiry: { type: Date }
   },
   {
     timestamps: true,
   }
 );
-
-userSchema.index({ otp: 1 }, { expireAfterSeconds: 300 }); 
-userSchema.index({ resetToken: 1 }, { expireAfterSeconds: 3600 }); 
 
 export const User = mongoose.model("User", userSchema);

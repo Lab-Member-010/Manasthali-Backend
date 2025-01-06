@@ -5,26 +5,38 @@ const transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: "jayeshsharmarplm@gmail.com", // Use environment variables in production
-    pass: "yhpg pnli jafg hywn",
+    user: "jayeshsharmarplm@gmail.com", 
+    pass: "yhpg pnli jafg hywn"
   },
 });
 
-function myOPT(email){
-    const otp = Math.floor(100000 + Math.random() * 900000).toString(); 
-    const mymail = {
-        from: "jayeshsharmarplm@gmail.com",
-        to: `${email}`,
-        subject: "Checking nodemailer",
-        html: `<p>Your otp is = <h1 style='color: green;'>${otp}</h1></p>`,
-    };
-    transporter.sendMail(mymail, (err, info) => {
-        if (err) {
-          console.error("Error occurred: ", err);
-        } else {
-          console.log("Email sent: ", info.response);
-        }
-      });
+function isValidEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
 }
 
-myOPT("aryangwale8827@gmail.com")
+export function myOPT(email) {
+  if (!isValidEmail(email)) {
+    console.error("Invalid email format");
+    return null; 
+  }
+
+  const otp = Math.floor(100000 + Math.random() * 900000).toString(); 
+
+  const mymail = {
+    from: "jayeshsharmarplm@gmail.com", 
+    to: email,
+    subject: "Your OTP Code",
+    html: `<p>Your OTP is: <h1 style='color: green;'>${otp}</h1></p>`,
+  };
+
+  transporter.sendMail(mymail, (err, info) => {
+    if (err) {
+      console.error("Error occurred while sending email: ", err);
+    } else {
+      console.log("Email sent: ", info.response);
+    }
+  });
+
+  return otp; 
+}
