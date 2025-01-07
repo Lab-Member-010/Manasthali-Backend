@@ -13,7 +13,7 @@ import notificationRouter from "./routes/notification.route.js";
 import postRouter from "./routes/post.route.js";
 import quizRouter from "./routes/quiz.route.js";
 import storyRouter from "./routes/story.route.js";
-import userRouter from "./routes/user.route.js"; // Import your user router
+import userRouter from "./routes/user.route.js"; 
 
 const app = express();
 
