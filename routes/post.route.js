@@ -1,9 +1,11 @@
 import express from 'express';
+import upload from '../middleware/uploadsdb.js';
+
 import { createPost, getPostDetails, updatePost, deletePost, likePost, unlikePost, getPostComments, sharePost } from '../controller/post.controller.js';
 
 const router = express.Router();
 
-router.post('/posts', createPost);
+router.post('/posts', upload.array('media', 5),createPost);
 router.get('/posts/:id', getPostDetails);
 router.put('/posts/:id', updatePost);
 router.delete('/posts/:id', deletePost);
