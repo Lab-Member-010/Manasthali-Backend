@@ -2,7 +2,8 @@ import { validationResult } from "express-validator";
 import { User } from "../model/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { myOPT } from "../mailer/mymail.js"; 
+import { myOPT, sendEmail } from "../mailer/mymail.js"; 
+import crypto from "crypto";
 
 //sign-up
 export const SignUp = async (request, response, next) => {
@@ -79,84 +80,96 @@ export const verifyOtp = async (req, res) => {
 export const forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
-
+    
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(404).json({ error: "User not found" });
+          return res.status(404).json({ error: "User not found" });
         }
-
-        // Generate a reset token and set its expiry time (optional)
+    
+        // Generate a reset token and set its expiry time
         const token = crypto.randomBytes(32).toString("hex");
         user.resetToken = token;
         user.resetTokenExpiry = Date.now() + 3600000; // Token valid for 1 hour
         await user.save();
-
-        // Send reset link to user's email
-        const resetLink = `http://localhost:3000/reset-password/${token}`;
-        await transporter.sendMail({
-            from: "your-email@gmail.com",
-            to: email,
-            subject: "Password Reset",
-            html: `<p>Click the link below to reset your password:</p>
-                   <a href="${resetLink}">${resetLink}</a>`,
+    
+        // Send reset instructions to the user's email
+        const htmlContent = `
+          <p>Your password reset token is:</p>
+          <h2>${token}</h2>
+          <p>Please use this token in the reset password form to reset your password. The token is valid for 1 hour.</p>
+        `;
+    
+        await sendEmail({
+          to: email,
+          subject: "Password Reset",
+          html: htmlContent,
         });
-
-        res.status(200).json({ message: "Password reset link sent successfully" });
-    } catch (err) {
+    
+        res.status(200).json({ message: "Password reset token sent to your email" });
+      } catch (err) {
         console.error("Error in forgotPassword:", err);
         res.status(500).json({ error: "Internal Server Error" });
-    }
+      }  
 };
 
 // Reset Password
 export const resetPassword = async (req, res) => {
     try {
         const { token, newPassword } = req.body;
-
+    
         // Find the user with the provided reset token and ensure it is not expired
         const user = await User.findOne({
-            resetToken: token,
-            resetTokenExpiry: { $gt: Date.now() }, // Ensure token is still valid
+          resetToken: token,
+          resetTokenExpiry: { $gt: Date.now() }, // Ensure token is still valid
         });
-
+    
         if (!user) {
-            return res.status(400).json({ error: "Invalid or expired reset token" });
+          return res.status(400).json({ error: "Invalid or expired reset token" });
         }
-
+    
         // Encrypt the new password
         const saltKey = bcrypt.genSaltSync(10);
         const encryptedPassword = bcrypt.hashSync(newPassword, saltKey);
-
+    
         // Update user's password and clear the reset token and expiry
         user.password = encryptedPassword;
         user.resetToken = null;
         user.resetTokenExpiry = null;
         await user.save();
-
+    
         res.status(200).json({ message: "Password reset successfully" });
-    } catch (err) {
+      } catch (err) {
         console.error("Error in resetPassword:", err);
         res.status(500).json({ error: "Internal Server Error" });
-    }
+      }
 };
 
 //sign-in
 export const SignIn = async (request, response, next) => {
     try {
-        let { email, password } = request.body;
-        let user = await User.findOne({ email });
+        const { email, password } = request.body;
+        const user = await User.findOne({ email });
+
         if (user) {
-            let status = bcrypt.compareSync(password, user.password);
-            if(status){
-                return response.status(200).json({message: "Sign in success..",user,token: generateToken(user.userId)});
-            }else{
-                return response.status(401).json({error: "Bad request | invalid password"});
+            if (!user.verified) {
+                return response.status(401).json({ error: "Please verify your account before logging in." });
             }
-        } else{
-            return response.status(401).json({error: "Bad request | invalid email id"});
+
+            const status = bcrypt.compareSync(password, user.password);
+            if (status) {
+                return response.status(200).json({
+                    message: "Sign in success.",
+                    user,
+                    token: generateToken(user.id),
+                });
+            } else {
+                return response.status(401).json({ error: "Invalid password" });
+            }
+        } else {
+            return response.status(401).json({ error: "Invalid email ID" });
         }
     } catch (err) {
-        console.log(err);
+        console.error("Error in SignIn:", err);
         return response.status(500).json({ error: "Internal Server Error" });
     }
 };

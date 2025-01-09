@@ -1,42 +1,58 @@
-import nodemailer from 'nodemailer';
+import nodemailer from "nodemailer";
 
+// Configure the transporter
 const transporter = nodemailer.createTransport({
   service: "Gmail",
   port: 465,
   secure: true,
   auth: {
     user: "jayeshsharmarplm@gmail.com", 
-    pass: "yhpg pnli jafg hywn"
+    pass: "yhpg pnli jafg hywn",
   },
 });
 
+// Utility to validate email format
 function isValidEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
 
-export function myOPT(email) {
-  if (!isValidEmail(email)) {
+// Reusable function to send emails
+export async function sendEmail({ to, subject, html }) {
+  if (!isValidEmail(to)) {
     console.error("Invalid email format");
-    return null; 
+    throw new Error("Invalid email format");
   }
 
-  const otp = Math.floor(100000 + Math.random() * 900000).toString(); 
-
-  const mymail = {
-    from: "jayeshsharmarplm@gmail.com", 
-    to: email,
-    subject: "Your OTP Code",
-    html: `<p>Your OTP is: <h1 style='color: green;'>${otp}</h1></p>`,
+  const mailOptions = {
+    from: "jayeshsharmarplm@gmail.com",
+    to,
+    subject,
+    html,
   };
 
-  transporter.sendMail(mymail, (err, info) => {
-    if (err) {
-      console.error("Error occurred while sending email: ", err);
-    } else {
-      console.log("Email sent: ", info.response);
-    }
-  });
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email sent: ", info.response);
+    return true;
+  } catch (err) {
+    console.error("Error occurred while sending email: ", err);
+    throw new Error("Failed to send email");
+  }
+}
 
-  return otp; 
+// Function to generate and send OTP
+export function myOPT(email) {
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+  const htmlContent = `
+    <p>Your OTP is:</p>
+    <h1 style='color: green;'>${otp}</h1>
+  `;
+
+  sendEmail({ to: email, subject: "Your OTP Code", html: htmlContent }).catch((err) =>
+    console.error("Error in sending OTP email:", err)
+  );
+
+  return otp;
 }
