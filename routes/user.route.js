@@ -15,6 +15,7 @@ import {
 } from "../controller/user.controller.js";
 import { body } from "express-validator";
 import { auth } from "../middleware/auth.js";
+import upload from '../middleware/uploadsdb.js';
 
 const router = express.Router();
 
@@ -56,7 +57,7 @@ router.post("/reset-password",
 router.get("/:id", auth, getUserById);
 
 // Update user details
-router.put("/:id", auth, updateUserById);
+router.put("/:id", auth,upload.single("profile_picture"), updateUserById);
 
 // Delete a user account
 router.delete("/:id", auth, deleteUserById);

@@ -199,9 +199,17 @@ export const getUserById = async (req, res) => {
 //update user profile
 export const updateUserById = async (req, res) => {
     try {
+        console.log(req.files);
+        console.log(req.params.id);
+        const {id}=req.params;
+        const profile_picture = req.file ? req.file.path : null;
+        const updateData = {
+            ...req.body,
+            ...(profile_picture && { profile_picture }),
+        };
         const updatedUser = await User.findOneAndUpdate(
-            { userId: req.params.id },
-            req.body,
+            { _id:id },
+            updateData,
             { new: true }
         );
         if (!updatedUser) {
