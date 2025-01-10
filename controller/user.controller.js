@@ -180,7 +180,7 @@ const generateToken = (userId) => {
     return token;
 };
 
-//get user profile
+ 
 export const getUserById = async (req, res) => {
     try {
         const user = await User.findOne({ userId: req.params.id });
@@ -196,7 +196,7 @@ export const getUserById = async (req, res) => {
     }
 };
 
-//update user profile
+ 
 export const updateUserById = async (req, res) => {
     try {
         console.log(req.files);
