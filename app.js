@@ -14,6 +14,7 @@ import postRouter from "./routes/post.route.js";
 import quizRouter from "./routes/quiz.route.js";
 import storyRouter from "./routes/story.route.js";
 import userRouter from "./routes/user.route.js"; 
+import challangesRoute from "./routes/challangesFile.route.js";
 
 const app = express();
 
@@ -36,7 +37,8 @@ mongoose.connect("mongodb://127.0.0.1:27017/mitraDb")
     app.use("/story", storyRouter);
     app.use("/badges", badgeRouter);
     app.use("/users", userRouter);
-
+    app.use("/challange",challangesRoute);
+    
     app.listen(3001, () => {
         console.log("Server Started....");
     });
