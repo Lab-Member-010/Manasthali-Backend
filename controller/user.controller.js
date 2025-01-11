@@ -149,7 +149,7 @@ export const SignIn = async (request, response, next) => {
     try {
         const { email, password } = request.body;
         const user = await User.findOne({ email });
-
+        console.log(user)
         if (user) {
             if (!user.verified) {
                 return response.status(401).json({ error: "Please verify your account before logging in." });
@@ -160,7 +160,7 @@ export const SignIn = async (request, response, next) => {
                 return response.status(200).json({
                     message: "Sign in success.",
                     user,
-                    token: generateToken(user.id),
+                    token: generateToken(user._id),
                 });
             } else {
                 return response.status(401).json({ error: "Invalid password" });
@@ -174,9 +174,10 @@ export const SignIn = async (request, response, next) => {
     }
 };
 
-//generate json webtoken
+// generate json webtoken
 const generateToken = (userId) => {
-    let token = jwt.sign({ payload: userId }, "youwillgavefun");
+    const secretKey = "thirdpartyproject";  // Use same secret key
+    let token = jwt.sign({ payload: userId }, secretKey);  // Sign the token with the secret key
     return token;
 };
 

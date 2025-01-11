@@ -1,34 +1,26 @@
-import ChallengesFile from "../model/challangesFile.model.js";
-import {User} from "../model/user.model.js";
-
-// Fetch today's challenge for the logged-in user
+import {User} from "../model/user.model.js"
 export const getDailyChallenge = async (req, res) => {
   try {
-    // Extract user ID from request (assumes authentication middleware)
     const userId = req.user._id;
+    console.log("User ID from token:", userId); // Debugging userId from token
 
-    // Fetch the user's personality type
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).select("personality_type");
+    console.log("User fetched:", user); // Debugging fetched user
+
     if (!user || !user.personality_type) {
       return res.status(404).json({ error: "User or personality type not found" });
     }
-    const personalityType = user.personality_type;
 
-    // Fetch the challenges for the user's personality type
-    const challengesFile = await ChallengesFile.findOne({});
-    const typeData = challengesFile.personalityTypes.find(
-      (pt) => pt.type === personalityType
-    );
+    const personalityType = user.personality_type;
+    const challengesFile = await challengesFile.findOne({});
+    const typeData = challengesFile.personalityTypes.find((pt) => pt.type === personalityType);
 
     if (!typeData) {
       return res.status(404).json({ error: "No challenges found for this personality type" });
     }
 
-    // Determine today's day number (1-30)
     const today = new Date();
     const dayOfMonth = today.getDate() % 30 || 30;
-
-    // Find today's challenge
     const todayChallenge = typeData.dares.find((dare) => dare.day === dayOfMonth);
 
     if (!todayChallenge) {

@@ -15,15 +15,14 @@ export const auth = async (req, res, next) => {
     }
 
     // Verify the token
-    const decoded = jwt.verify(
-      token,
-      "fdfjfjrwieroerivxcnmvnnvrweiorddfsdfdlkfjlfjljlraj" //secret key
-    );
+    const decoded = jwt.verify(token, "thirdpartyproject"); // Use the same secret key
+    console.log(decoded); // Log decoded token for debugging
 
     // Attach the user data to the request object
-    req.user = decoded; // Contains the user info (e.g., id, email, etc.)
+    req.user = decoded.userId; // Access the userId directly
     next();
   } catch (err) {
+    console.error("Error during authentication:", err);
     return res.status(401).json({ error: "Unauthorized access" });
   }
 };
