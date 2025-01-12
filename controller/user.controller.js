@@ -1,5 +1,6 @@
 import { validationResult } from "express-validator";
 import { User } from "../model/user.model.js";
+import { Quiz } from "../model/quiz.model.js"; 
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { myOPT, sendEmail } from "../mailer/mymail.js"; 
@@ -326,6 +327,45 @@ export const unfollowUser = async (req, res) => {
         return res.status(200).json({ message: "User unfollowed successfully" });
     } catch (err) {
         console.error(err);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+// Add Personality Type from Quiz to User
+export const addPersonalityType = async (req, res) => {
+    try {
+        const userId = req.user.payload; // Assuming the user is authenticated and `userId` is in the payload of the token
+        const { quizId } = req.body; // We'll get the `quizId` from the body of the request
+        
+        // Step 1: Fetch the quiz using the provided quizId
+        const quiz = await Quiz.findById(quizId);
+        
+        if (!quiz) {
+            return res.status(404).json({ error: "Quiz not found" });
+        }
+        
+        // Step 2: Fetch the personality type from the quiz model
+        const { personality_type } = quiz;
+        
+        // Step 3: Fetch the user by userId
+        const user = await User.findById(userId);
+        
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        
+        // Step 4: Update the user's personality type
+        user.personality_type = personality_type; // Assign the personality type from the quiz
+        
+        // Step 5: Save the updated user
+        await user.save();
+        
+        return res.status(200).json({
+            message: "Personality type added to user successfully",
+            personality_type: user.personality_type
+        });
+    } catch (err) {
+        console.error("Error in addPersonalityType:", err);
         return res.status(500).json({ error: "Internal Server Error" });
     }
 };

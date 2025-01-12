@@ -15,11 +15,11 @@ const quizSchema = new mongoose.Schema({
     T_F: Number,
     J_P: Number,
   },
-  personality_type_result: String,
+  personality_type: String,
   community_id: { type: mongoose.Schema.Types.ObjectId, ref: "Community" },
   result_date: { type: Date, default: Date.now }
 }, {
   timestamps: true
 });
 
-export default mongoose.model("Quiz", quizSchema);
+export const Quiz= mongoose.model("Quiz", quizSchema);

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import ChallengesFile from "../model/challengesFile.model.js";
+import {ChallengesFile} from "../model/challengesFile.model.js";
 import fs from "fs";
 
 // Connect to MongoDB

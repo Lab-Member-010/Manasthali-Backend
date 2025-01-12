@@ -12,6 +12,7 @@ import {
   verifyOtp,
   forgotPassword,
   resetPassword,
+  addPersonalityType
 } from "../controller/user.controller.js";
 import { body } from "express-validator";
 import { auth } from "../middleware/auth.js";
@@ -73,6 +74,7 @@ router.post("/:id/follow", auth, followUser);
 
  
 router.post("/:id/unfollow", auth, unfollowUser);
-// router.post("/follow-request",auth,sendfollowrequest);
-// router.post("/follow-request/handel",auth,handelrequest);
+
+router.post("/add-personality-type", auth, addPersonalityType);
+
 export default router;

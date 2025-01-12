@@ -20,4 +20,4 @@ const challengesFileSchema = new mongoose.Schema({
   personalityTypes: [personalityTypeSchema],
 });
 
-export default mongoose.model("ChallengesFile", challengesFileSchema);
+export const ChallengesFile = mongoose.model("ChallengesFile", challengesFileSchema);

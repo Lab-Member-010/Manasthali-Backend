@@ -63,8 +63,7 @@ const userSchema = new mongoose.Schema(
       type: Number,
     },
     personality_type: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "PersonalityType",
+      type: String
     },
     badges: [
       {
