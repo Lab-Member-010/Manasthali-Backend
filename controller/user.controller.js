@@ -9,7 +9,6 @@ import crypto from "crypto";
 //sign-up
 export const SignUp = async (request, response, next) => {
     try {
-        // Validate request body using express-validator
         const errors = validationResult(request);
         if (!errors.isEmpty()) {
             console.error("Validation errors:", errors.array());
@@ -18,7 +17,6 @@ export const SignUp = async (request, response, next) => {
 
         const { email, password, username, contact,dob, gender } = request.body;
 
-        // Check if email already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             console.error(`Email already exists: ${email}`);
@@ -45,7 +43,6 @@ export const SignUp = async (request, response, next) => {
         });
         await user.save();
 
-        // Return success response
         return response.status(201).json({
             message: "Sign up success. OTP sent to your email.",
             user: { id: user.id, email: user.email, username: user.username }, // Send only safe data
@@ -118,7 +115,6 @@ export const resetPassword = async (req, res) => {
     try {
         const { token, newPassword } = req.body;
     
-        // Find the user with the provided reset token and ensure it is not expired
         const user = await User.findOne({
           resetToken: token,
           resetTokenExpiry: { $gt: Date.now() }, // Ensure token is still valid
@@ -177,12 +173,12 @@ export const SignIn = async (request, response, next) => {
 
 // generate json webtoken
 const generateToken = (userId) => {
-    const secretKey = "thirdpartyproject";  // Use same secret key
-    let token = jwt.sign({ payload: userId }, secretKey);  // Sign the token with the secret key
+    const secretKey = "thirdpartyproject";  
+    let token = jwt.sign({ payload: userId }, secretKey);  
     return token;
 };
 
- 
+// get user details
 export const getUserById = async (req, res) => {
     try {
         const user = await User.findOne({ userId: req.params.id });
@@ -198,7 +194,7 @@ export const getUserById = async (req, res) => {
     }
 };
 
- 
+// update user details
 export const updateUserById = async (req, res) => {
     try {
         console.log(req.files);
@@ -327,45 +323,6 @@ export const unfollowUser = async (req, res) => {
         return res.status(200).json({ message: "User unfollowed successfully" });
     } catch (err) {
         console.error(err);
-        return res.status(500).json({ error: "Internal Server Error" });
-    }
-};
-
-// Add Personality Type from Quiz to User
-export const addPersonalityType = async (req, res) => {
-    try {
-        const userId = req.user.payload; // Assuming the user is authenticated and `userId` is in the payload of the token
-        const { quizId } = req.body; // We'll get the `quizId` from the body of the request
-        
-        // Step 1: Fetch the quiz using the provided quizId
-        const quiz = await Quiz.findById(quizId);
-        
-        if (!quiz) {
-            return res.status(404).json({ error: "Quiz not found" });
-        }
-        
-        // Step 2: Fetch the personality type from the quiz model
-        const { personality_type } = quiz;
-        
-        // Step 3: Fetch the user by userId
-        const user = await User.findById(userId);
-        
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
-        
-        // Step 4: Update the user's personality type
-        user.personality_type = personality_type; // Assign the personality type from the quiz
-        
-        // Step 5: Save the updated user
-        await user.save();
-        
-        return res.status(200).json({
-            message: "Personality type added to user successfully",
-            personality_type: user.personality_type
-        });
-    } catch (err) {
-        console.error("Error in addPersonalityType:", err);
         return res.status(500).json({ error: "Internal Server Error" });
     }
 };

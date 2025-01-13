@@ -1,6 +1,10 @@
 import express from "express";
 import mongoose from "mongoose";
+import http from 'http';
+import { Server } from 'socket.io';  
 import bodyParser from "body-parser";
+import cors from "cors";
+
 import badgeRouter from "./routes/badge.route.js";
 import commentRouter from "./routes/comment.route.js";
 import communityRouter from "./routes/community.route.js";
@@ -16,7 +20,11 @@ import userRouter from "./routes/user.route.js";
 import challangesRoute from "./routes/challengesFile.route.js";
 import cors from "cors";
 
+
 const app = express();
+app.use(cors());
+const server = http.createServer(app);
+const io = new Server(server);  
 
 // Apply CORS middleware globally
 app.use(cors({
@@ -48,9 +56,21 @@ mongoose.connect("mongodb://127.0.0.1:27017/mitraDb")
     app.use("/users", userRouter);
     app.use("/challange", challangesRoute);
 
-    // Start the server
-    app.listen(3001, () => {
-        console.log("Server Started on http://localhost:3001");
+    io.on('connection', (socket) => {
+      console.log('A user connected');
+      
+      // Listen for new messages and broadcast them
+      socket.on('send-message', (data) => {
+        io.to(data.receiverId).emit('receive-message', data);
+      });
+
+      socket.on('disconnect', () => {
+        console.log('A user disconnected');
+      });
+    });
+
+    server.listen(3001, () => {
+      console.log('Server started...');
     });
   })
   .catch(err => {

@@ -11,8 +11,7 @@ import {
   unfollowUser,
   verifyOtp,
   forgotPassword,
-  resetPassword,
-  addPersonalityType
+  resetPassword
 } from "../controller/user.controller.js";
 import { body } from "express-validator";
 import { auth } from "../middleware/auth.js";
@@ -72,9 +71,7 @@ router.get("/:id/following", auth, getUserFollowing);
 // Follow a user
 router.post("/:id/follow", auth, followUser);
 
- 
+// Unfollow a user
 router.post("/:id/unfollow", auth, unfollowUser);
-
-router.post("/add-personality-type", auth, addPersonalityType);
 
 export default router;
