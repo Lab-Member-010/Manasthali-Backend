@@ -18,7 +18,6 @@ import quizRouter from "./routes/quiz.route.js";
 import storyRouter from "./routes/story.route.js";
 import userRouter from "./routes/user.route.js"; 
 import challangesRoute from "./routes/challengesFile.route.js";
-import messageRouter from './routes/message.route.js';
 
 const app = express();
 app.use(cors());
@@ -44,7 +43,6 @@ mongoose.connect("mongodb://127.0.0.1:27017/mitraDb")
     app.use("/badges", badgeRouter);
     app.use("/users", userRouter);
     app.use("/challange", challangesRoute);
-    app.use('/messages', messageRouter);
 
     io.on('connection', (socket) => {
       console.log('A user connected');
