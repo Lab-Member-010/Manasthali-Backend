@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import http from 'http';
 import { Server } from 'socket.io';  
 import bodyParser from "body-parser";
+import cors from "cors";
+
 import badgeRouter from "./routes/badge.route.js";
 import commentRouter from "./routes/comment.route.js";
 import communityRouter from "./routes/community.route.js";
@@ -19,6 +21,7 @@ import challangesRoute from "./routes/challengesFile.route.js";
 import messageRouter from './routes/message.route.js';
 
 const app = express();
+app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server);  
 
