@@ -18,18 +18,30 @@ import quizRouter from "./routes/quiz.route.js";
 import storyRouter from "./routes/story.route.js";
 import userRouter from "./routes/user.route.js"; 
 import challangesRoute from "./routes/challengesFile.route.js";
+import cors from "cors";
+
 
 const app = express();
 app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server);  
 
+// Apply CORS middleware globally
+app.use(cors({
+    origin: "http://localhost:3000", // Allow requests from this origin
+    methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
+}));
+
 mongoose.connect("mongodb://127.0.0.1:27017/mitraDb")
   .then(() => {
     console.log("Database connected...");
+
+    // Middleware to parse request bodies
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
 
+    // Define routes
     app.use("/comments", commentRouter);
     app.use("/communities", communityRouter);
     app.use("/games", gameRouter);
@@ -60,6 +72,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/mitraDb")
     server.listen(3001, () => {
       console.log('Server started...');
     });
-}).catch(err => {
-    console.log(err);
-});
+  })
+  .catch(err => {
+    console.error("Database connection error:", err);
+  });
