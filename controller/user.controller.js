@@ -1,7 +1,7 @@
 import { validationResult } from "express-validator";
 import { User } from "../model/user.model.js";
 import { Quiz } from "../model/quiz.model.js"; 
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { myOPT, sendEmail } from "../mailer/mymail.js"; 
 import crypto from "crypto";
