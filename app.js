@@ -18,7 +18,7 @@ import quizRouter from "./routes/quiz.route.js";
 import storyRouter from "./routes/story.route.js";
 import userRouter from "./routes/user.route.js"; 
 import challangesRoute from "./routes/challengesFile.route.js";
-import cors from "cors";
+
 
 
 const app = express();
