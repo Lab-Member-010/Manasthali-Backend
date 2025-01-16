@@ -2,13 +2,7 @@ import mongoose from "mongoose";
 
 const quizSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  quiz_attempt: { type: Number, default: 1 },
-  answers: [
-    {
-      question_id: String,
-      answer: { type: Number, required: true }
-    },
-  ],
+  answers: [{ type: Number }],
   scores: {
     E_I: Number,
     S_N: Number,
@@ -16,10 +10,9 @@ const quizSchema = new mongoose.Schema({
     J_P: Number,
   },
   personality_type: String,
-  community_id: { type: mongoose.Schema.Types.ObjectId, ref: "Community" },
-  result_date: { type: Date, default: Date.now }
+  result_date: { type: Date, default: Date.now },
 }, {
   timestamps: true
 });
 
-export const Quiz= mongoose.model("Quiz", quizSchema);
+export const Quiz = mongoose.model("Quiz", quizSchema);
