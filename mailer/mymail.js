@@ -6,8 +6,8 @@ const transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: "jayeshsharmarplm@gmail.com", 
-    pass: "yhpg pnli jafg hywn",
+    user: "contactmanasthali@gmail.com", 
+    pass: "vmbx dezq txjm iblc",
   },
 });
 
@@ -25,7 +25,7 @@ export async function sendEmail({ to, subject, html }) {
   }
 
   const mailOptions = {
-    from: "jayeshsharmarplm@gmail.com",
+    from: "contactmanasthali@gmail.com",
     to,
     subject,
     html,
