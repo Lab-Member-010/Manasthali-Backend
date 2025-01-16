@@ -76,45 +76,48 @@ export const verifyOtp = async (req, res) => {
 
 // Forgot Password
 export const forgotPassword = async (req, res) => {
-    try {
-        const { email } = req.body;
-    
-        const user = await User.findOne({ email });
-        if (!user) {
-          return res.status(404).json({ error: "User not found" });
-        }
-    
-        // Generate a reset token and set its expiry time
-        const token = crypto.randomBytes(32).toString("hex");
-        user.resetToken = token;
-        user.resetTokenExpiry = Date.now() + 3600000; // Token valid for 1 hour
-        await user.save();
-    
-        // Send reset instructions to the user's email
-        const htmlContent = `
-          <p>Your password reset token is:</p>
-          <h2>${token}</h2>
-          <p>Please use this token in the reset password form to reset your password. The token is valid for 1 hour.</p>
-        `;
-    
-        await sendEmail({
-          to: email,
-          subject: "Password Reset",
-          html: htmlContent,
-        });
-    
-        res.status(200).json({ message: "Password reset token sent to your email" });
-      } catch (err) {
-        console.error("Error in forgotPassword:", err);
-        res.status(500).json({ error: "Internal Server Error" });
-      }  
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Generate a reset token and set its expiry time
+    const token = crypto.randomBytes(32).toString("hex");
+    user.resetToken = token;
+    user.resetTokenExpiry = Date.now() + 3600000; // Token valid for 1 hour
+    await user.save();
+    console.log(token);
+    // Construct the reset link
+    const resetLink = `http://localhost:3000/reset-password?token=${token}`;
+
+    // Send reset instructions to the user's email
+    const htmlContent = `
+      <p>Click the link below to reset your password:</p>
+      <a href="${resetLink}" target="_blank">Reset Password</a>
+      <p>This link is valid for 1 hour.</p>
+    `;
+
+    await sendEmail({
+      to: email,
+      subject: "Password Reset",
+      html: htmlContent,
+    });
+
+    res.status(200).json({ message: "Password reset link sent to your email" });
+  } catch (err) {
+    console.error("Error in forgotPassword:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 };
 
 // Reset Password
 export const resetPassword = async (req, res) => {
     try {
         const { token, newPassword } = req.body;
-    
+        console.log(token+newPassword);
         const user = await User.findOne({
           resetToken: token,
           resetTokenExpiry: { $gt: Date.now() }, // Ensure token is still valid
