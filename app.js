@@ -30,13 +30,10 @@ const io = new Server(server, {
     }
 });
 
-<<<<<<< HEAD
-=======
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
->>>>>>> origin/swasti
 mongoose.connect("mongodb://127.0.0.1:27017/mitraDb")
   .then(() => {
     console.log("Database connected...");
