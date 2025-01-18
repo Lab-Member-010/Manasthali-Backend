@@ -58,7 +58,14 @@ mongoose.connect("mongodb://127.0.0.1:27017/mitraDb")
       
       // Listen for new messages and broadcast them
       socket.on('send-message', (data) => {
-        io.to(data.receiverId).emit('receive-message', data);
+        try {
+          if (!data.receiverId || !data.message) {
+            throw new Error('Receiver or message missing');
+          }
+          io.to(data.receiverId).emit('receive-message', data);
+        } catch (err) {
+          console.error("Error sending message:", err);
+        }
       });
 
       socket.on('disconnect', () => {
