@@ -1,9 +1,11 @@
 import mongoose from "mongoose";
 import {ChallengesFile} from "../model/challengesFile.model.js";
 import fs from "fs";
+import dotenv from "dotenv";
+dotenv.config();
 
 // Connect to MongoDB
-mongoose.connect("mongodb://127.0.0.1:27017/mitraDb", {
+mongoose.connect(process.env.DB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });

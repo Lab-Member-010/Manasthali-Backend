@@ -4,6 +4,7 @@ import http from 'http';
 import { Server } from 'socket.io';  
 import bodyParser from "body-parser";
 import cors from "cors";
+import dotenv from 'dotenv';
 
 import badgeRouter from "./routes/badge.route.js";
 import commentRouter from "./routes/comment.route.js";
@@ -20,6 +21,7 @@ import storyRouter from "./routes/story.route.js";
 import userRouter from "./routes/user.route.js"; 
 import challangesRoute from "./routes/challengesFile.route.js";
 
+dotenv.config();
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -34,7 +36,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-mongoose.connect("mongodb://127.0.0.1:27017/mitraDb")
+mongoose.connect(process.env.DB_URI)
   .then(() => {
     console.log("Database connected...");
 
@@ -73,7 +75,8 @@ mongoose.connect("mongodb://127.0.0.1:27017/mitraDb")
       });
     });
 
-    server.listen(3001, () => {
+    const port = process.env.PORT || 3000;
+    server.listen(port, () => {
       console.log('Server started...');
     });
   })
