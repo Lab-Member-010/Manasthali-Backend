@@ -1,10 +1,14 @@
-import { Message } from '../model/message.model.js';
+import {Message} from "../model/message.model.js"
 
-// Send message
 export const sendMessage = async (req, res) => {
   try {
     const { receiverId, message } = req.body;
     const senderId = req.user._id;
+
+    // Basic validation
+    if (!receiverId || !message) {
+      return res.status(400).json({ error: "Receiver ID and message are required" });
+    }
 
     const newMessage = new Message({
       sender: senderId,
@@ -20,7 +24,6 @@ export const sendMessage = async (req, res) => {
   }
 };
 
-// Get messages between two users
 export const getMessages = async (req, res) => {
   try {
     const { receiverId } = req.params;
@@ -33,6 +36,10 @@ export const getMessages = async (req, res) => {
       ],
     }).sort({ createdAt: 1 }); // Sort by createdAt field for proper order
 
+    if (messages.length === 0) {
+      return res.status(404).json({ message: 'No messages found' });
+    }
+
     res.status(200).json({ messages });
   } catch (err) {
     console.error("Error fetching messages:", err);
@@ -40,8 +47,6 @@ export const getMessages = async (req, res) => {
   }
 };
 
-// Mark message as read
- 
 export const markAsRead = async (req, res) => {
   try {
     const { messageId } = req.body;
@@ -54,6 +59,9 @@ export const markAsRead = async (req, res) => {
     }
     if (message.receiver.toString() !== req.user._id.toString()) {
       return res.status(403).json({ error: "You are not authorized to mark this message as read" });
+    }
+    if (message.read) {
+      return res.status(400).json({ message: "Message is already marked as read" });
     }
     message.read = true;
     await message.save();
