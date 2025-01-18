@@ -8,8 +8,6 @@ import {
   getUserFollowers,
   getUserFollowing,
   followUser,
-  handleFollowRequest,
-  sendFollowRequest,
   unfollowUser,
   verifyOtp,
   forgotPassword,
@@ -77,9 +75,3 @@ router.post("/follow", auth, followUser);
 router.post("/unfollow", auth, unfollowUser);
 
 export default router;
-
-//  Follow a user
-// router.post("/:id/follow", auth, followUser);
-
-// Unfollow a user
-// router.post("/:id/unfollow", auth, unfollowUser);
