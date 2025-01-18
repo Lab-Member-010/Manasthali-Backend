@@ -41,22 +41,23 @@ export const getMessages = async (req, res) => {
 };
 
 // Mark message as read
+ 
 export const markAsRead = async (req, res) => {
   try {
     const { messageId } = req.body;
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
     const message = await Message.findById(messageId);
-
     if (!message) {
       return res.status(404).json({ error: "Message not found" });
     }
-
     if (message.receiver.toString() !== req.user._id.toString()) {
       return res.status(403).json({ error: "You are not authorized to mark this message as read" });
     }
-
     message.read = true;
     await message.save();
-    res.status(200).json({ message: "Message marked as read" });
+    res.status(200).json({ message: "Message marked as read", messageDetails: message });
   } catch (err) {
     console.error("Error marking message as read:", err);
     res.status(500).json({ error: "Internal Server Error" });
