@@ -1,7 +1,6 @@
 import express from 'express';
 import  {auth} from "../middleware/auth.js"
 import { addComment, getCommentDetails, updateComment, deleteComment, likeComment } from '../controller/comment.controller.js';
-import { auth } from '../middleware/auth.js';
 const router = express.Router();
 
 router.post('/comments',auth, addComment);
