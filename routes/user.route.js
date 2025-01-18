@@ -69,12 +69,12 @@ router.get("/:id/followers", auth, getUserFollowers);
 
 // Get users that the user is following
 router.get("/:id/following", auth, getUserFollowing);
-router.post("/:id/follow", auth, followUser);
-router.post("/:id/handle-request", auth, handleFollowRequest);
-router.post("/:id/follow-request", auth, sendFollowRequest);
-router.post("/:id/unfollow", auth, unfollowUser);
 
+// Follow a user
+router.post("/follow", auth, followUser);
 
+// Unfollow a user
+router.post("/unfollow", auth, unfollowUser);
 
 export default router;
 
