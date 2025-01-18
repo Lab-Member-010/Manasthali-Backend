@@ -106,8 +106,10 @@ export const likeComment = async (req, res) => {
     const { id } = req.params;
     const { user_id } = req.body;
 
+
     const comment = await Comment.findOne({ _id: id });
     const user = await User.findOne({ _id: user_id });
+    console.log(user);
 
     if (!comment) {
       return res.status(404).json({ message: "Comment not found" });
