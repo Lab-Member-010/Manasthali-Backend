@@ -87,7 +87,6 @@ catch(error){
 // Like a post
 export const likePost = async (request, response) => {
   // Logic to like a post
-
   try{
     const {id}=request.params;
     const {userId}=request.body;
@@ -142,26 +141,77 @@ catch(error){
 }
 };
 
+export const addComment = async (req, res) => {
+  try {
+    const { id } = req.params;  
+    const { text } = req.body;
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ message: "User not authenticated" });
+    }
+
+    const user_id = req.user._id; 
+    const post = await Post.findById(id);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    // Create a new comment
+    const newComment = new Comment({
+      post_id: id, // Correct reference to post_id
+      user_id,     // Correct user_id
+      text,
+    });
+    // Save the comment
+    await newComment.save();
+    // Add the comment to the post's comments array
+    post.comments.push(newComment._id);
+    post.comment_count += 1;
+    await post.save();
+    return res.status(201).json({
+      message: "Comment added successfully",
+      comment: newComment,
+    });
+  } catch (error) {
+    console.error("Error adding comment:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+     
+
 // Get comments on a post
-export const getPostComments = async (request, response,next) => {
-  // Logic to fetch comments on a post
-try{
-  const {id}=request.params;
- const PostById=await Post.findOne({_id:id}).populate("comments")
- if(!PostById)
-  {
-    return response.status(404).json({message:"post not found"})
+export const getPostComments = async (req, res, next) => {
+  try {
+    const { id } = req.params;
 
- }
- const comments=await Comment.find({_id:id}).populate('userId')
- return response.status(201).json({message:"comments fetch successfully",comments})
+    // Post को पॉप्युलेट करें
+    const post = await Post.findById(id).populate({
+      path: "comments", // Post के comments को पॉप्युलेट करें
+      select: "comment user_id", // comment और user_id को पॉप्युलेट करें
+      populate: {
+        path: "user_id", // Comment के user_id को पॉप्युलेट करें
+        select: "name email", // केवल नाम और ईमेल को पॉप्युलेट करें
+      },
+    });
 
-}
-catch(error){
-  console.log(error);
-  return response.status(500).json({error:"intenal server error"})
-}
-  
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    // comments में "comment" फील्ड शामिल है
+    const comments = post.comments.map(comment => ({
+      ...comment.toObject(),
+      comment: comment.comment // comment टेक्स्ट को निकालें
+    }));
+
+    return res.status(200).json({
+      message: "Comments fetched successfully",
+      comments, // Comments के साथ comment टेक्स्ट भी होगा
+    });
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 // Share a post
