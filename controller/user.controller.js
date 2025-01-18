@@ -22,14 +22,11 @@ export const SignUp = async (request, response, next) => {
             console.error(`Email already exists: ${email}`);
             return response.status(409).json({ error: "Email already exists" });
         }
-
         // Generate OTP
         const otp = myOPT(email);
-
         // Encrypt password
         const saltKey = bcrypt.genSaltSync(10);
         const encryptedPassword = bcrypt.hashSync(password, saltKey);
-
         // Create a new user with `verified` set to false
         const user = new User({
             email,
@@ -42,7 +39,6 @@ export const SignUp = async (request, response, next) => {
             verified: false,
         });
         await user.save();
-
         return response.status(201).json({
             message: "Sign up success. OTP sent to your email.",
             user: { id: user.id, email: user.email, username: user.username }, // Send only safe data
@@ -62,11 +58,9 @@ export const verifyOtp = async (req, res) => {
         if (!user) {
             return res.status(400).json({ error: "Invalid OTP" });
         }
-
         user.verified = true; 
         user.otp = null;
         await user.save();
-
         res.status(200).json({ message: "OTP verified successfully. Your account is now active." });
     } catch (err) {
         console.error(err);
@@ -279,35 +273,121 @@ export const getUserFollowing = async (req, res) => {
         return res.status(500).json({ error: "Internal Server Error" });
     }
 };
+ 
+ 
+export const followUser = async (req, res, next) => {
+     
 
-//follow user
-export const followUser = async (req, res) => {
     try {
-        const currentUser = await User.findById(req.user.payload); 
-        const targetUser = await User.findById(req.params.id); 
+        const user = await User.findById(req.params.id);
+        const currentUser = await User.findById(req.user.id);  // From token
 
-        if (!currentUser || !targetUser) {
-            return res.status(404).json({ error: "User not found" });
+        if (!user || !currentUser) {
+            return res.status(404).json({ message: 'User not found' });
         }
 
-        if (!currentUser.following.includes(targetUser._id)) {
-            currentUser.following.push(targetUser._id);
-            await currentUser.save();
+        if (user.followers.includes(req.user.id)) {
+            return res.status(400).json({ message: 'You already follow this user' });
         }
 
-        if (!targetUser.followers.includes(currentUser._id)) {
-            targetUser.followers.push(currentUser._id);
-            await targetUser.save();
-        }
+        user.followers.push(req.user.id);
+        currentUser.following.push(req.params.id);
 
-        return res.status(200).json({ message: "User followed successfully" });
+        await user.save();
+        await currentUser.save();
+
+        res.status(200).json({ message: 'User followed successfully' });
     } catch (err) {
-        console.error(err);
-        return res.status(500).json({ error: "Internal Server Error" });
+        res.status(500).json({ message: 'Error following user', error: err.message });
+    }
+
+};
+
+ 
+export const sendFollowRequest = async (req, res) => {
+    try {
+        const { senderId, receiverId } = req.body;  
+        const receiver = await User.findById(receiverId); 
+        if (!receiver || !senderId) {
+            return res.status(404).json({ message: "Invalid sender or receiver ID" });
+        }
+        console.log("Sender ID:", senderId);
+        console.log("Receiver ID:", receiverId);
+        console.log("Receiver Privacy:", receiver.privacy_settings.profile_visibility);
+        if (receiver.privacy_settings.profile_visibility === "public") {
+            receiver.followers.push(senderId);  
+            const sender = await User.findById(senderId);
+            sender.following.push(receiverId); 
+            await receiver.save();  
+            await sender.save();
+            return res.status(200).json({ message: "Followed successfully!" });
+        } else {
+            receiver.follow_requests.push({ sender: senderId, status: "pending" });  
+            await receiver.save();
+            return res.status(200).json({ message: "Follow request sent!" });
+        }
+    } catch (error) {
+        console.error("Error sending follow request:", error);
+        return res.status(500).json({ message: "Internal Server Error", error: error.message });
     }
 };
 
-//unfollow user
+// Handle follow request
+export const handleFollowRequest = async (req, res) => {
+    const { receiverId, senderId, action } = req.body;  
+    const receiver = await User.findById(receiverId);  
+    if (!receiver) return res.status(404).json({ message: "User not found" });
+
+    const request = receiver.follow_requests.find(req => req.sender.toString() === senderId);  
+    if (!request) return res.status(404).json({ message: "Follow request not found" });
+
+    if (action === "accept") {
+        request.status = "accepted";  
+        receiver.followers.push(senderId); 
+
+        const sender = await User.findById(senderId);
+        sender.following.push(receiverId);  
+        await sender.save();
+    } else if (action === "reject") {
+        request.status = "rejected";  
+    }
+
+    await receiver.save();  
+    return res.status(200).json({ message: `Request ${action}ed!` });
+};
+
+
+
+
+
+//follow user
+// export const followUser = async (req, res) => {
+//     try {
+//         const currentUser = await User.findById(req.user.payload); 
+//         const targetUser = await User.findById(req.params.id); 
+
+//         if (!currentUser || !targetUser) {
+//             return res.status(404).json({ error: "User not found" });
+//         }
+
+//         if (!currentUser.following.includes(targetUser._id)) {
+//             currentUser.following.push(targetUser._id);
+//             await currentUser.save();
+//         }
+
+//         if (!targetUser.followers.includes(currentUser._id)) {
+//             targetUser.followers.push(currentUser._id);
+//             await targetUser.save();
+//         }
+
+//         return res.status(200).json({ message: "User followed successfully" });
+//     } catch (err) {
+//         console.error(err);
+//         return res.status(500).json({ error: "Internal Server Error" });
+//     }
+// };
+
+// //unfollow user
 export const unfollowUser = async (req, res) => {
     try {
         const currentUser = await User.findById(req.user.payload);

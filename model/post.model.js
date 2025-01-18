@@ -11,7 +11,8 @@ const postSchema = new mongoose.Schema({
   shared_post_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Post', optional: true },
   communityId: { type: mongoose.Schema.Types.ObjectId, ref: 'Community' },
   location: String,
-  shares: { type: Number, default: 0 }
+  shares: { type: Number, default: 0 },
+  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }]
 }, {
   timestamps: true
 });
