@@ -118,7 +118,7 @@ export const forgotPassword = async (req, res) => {
     .header {
       text-align: center;
       padding: 20px;
-      background-color: #6a1b9a; /* Purple background */
+      background-color: #8e24aa; /* Purple background */
       color: white;
       border-radius: 8px 8px 0 0;
     }
@@ -185,7 +185,7 @@ export const forgotPassword = async (req, res) => {
       <a href="${resetLink}" style="color:white;" class="reset-button" target="_blank">Reset Password</a>
 
       <p>This link is valid for 1 hour. After that, the reset link will expire for security reasons.</p>
-      <p>If you need further assistance, feel free to <a href="mailto:support@manasthali.com">contact our support team</a>.</p>
+      <p>If you need further assistance, feel free to <a href="mailto:${process.env.MAIL_USER}">contact our support team</a>.</p>
     </div>
 
     <!-- Footer -->
