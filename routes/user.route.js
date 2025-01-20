@@ -26,7 +26,6 @@ router.post(
   body("email", "Invalid email ID").isEmail(),
   body("email", "Email ID is required").notEmpty(),
   body("password", "Password is required").notEmpty(),
-  body("contact", "Only digits are allowed in contact").isNumeric(),
   SignUp
 );
 
