@@ -4,6 +4,9 @@ import {
   SignIn,
   getUserById,
   updateUserById,
+  contactUpdateById,
+  DobUpdateById,
+  genderUpdate,
   deleteUserById,
   getUserFollowers,
   getUserFollowing,
@@ -26,7 +29,6 @@ router.post(
   body("email", "Invalid email ID").isEmail(),
   body("email", "Email ID is required").notEmpty(),
   body("password", "Password is required").notEmpty(),
-  body("contact", "Only digits are allowed in contact").isNumeric(),
   SignUp
 );
 
@@ -59,6 +61,14 @@ router.get("/:id", auth, getUserById);
 // Update user details
 router.put("/:id", auth,upload.single("profile_picture"), updateUserById);
 
+// Update user contact
+router.put("/:id/contact",auth,contactUpdateById)
+
+// Update user DOB
+router.put("/:id/dob",auth,DobUpdateById);
+
+// Update user gender
+router.put("/:id/gender",auth,genderUpdate);
 // Delete a user account
 router.delete("/:id", auth, deleteUserById);
 
