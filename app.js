@@ -9,7 +9,7 @@ import dotenv from 'dotenv';
 
 import badgeRouter from "./routes/badge.route.js";
 import commentRouter from "./routes/comment.route.js";
-// import communityRouter from "./routes/community.route.js";
+import communityRouter from "./routes/community.route.js";
 import gameRouter from "./routes/game.route.js";
 import groupRouter from "./routes/group.route.js";
 import groupmessageRouter from "./routes/groupmessage.route.js";
@@ -58,7 +58,7 @@ mongoose.connect(process.env.DB_URI)
     app.use("/story", storyRouter);
     app.use("/badges", badgeRouter);
     app.use("/users", userRouter);
-    app.use("/challange", challengesRoute);
+    app.use("/challenge", challengesRoute);
 
     // Socket.IO for real-time group chat functionality
     io.on('connection', (socket) => {
