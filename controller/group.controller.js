@@ -3,7 +3,7 @@ import Community from '../model/community.model.js';
 
 // Create a new group
 export const createGroup = async (req, res) => {
-  const { name, description, communityId, members } = req.body;
+  const { name, description,members } = req.body;
 
   // Check if user is authenticated (req.user is populated by the auth middleware)
   if (!req.user) {
