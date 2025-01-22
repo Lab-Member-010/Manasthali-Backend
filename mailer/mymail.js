@@ -27,7 +27,7 @@ export async function sendEmail({ to, subject, html }) {
   }
 
   const mailOptions = {
-    from: "contactmanasthali@gmail.com",
+    from: process.env.MAIL_USER,
     to,
     subject,
     html,
