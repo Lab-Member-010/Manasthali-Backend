@@ -18,11 +18,11 @@ const userSchema = new mongoose.Schema(
     },
     contact: {
       type: String,
-      required: true,
+      
     },
     dob: {
       type: Date,
-      required: true,
+    
     },
     bio: {
       type: String,
@@ -54,7 +54,7 @@ const userSchema = new mongoose.Schema(
     ],
     gender: {
       type: String,
-      required: true,
+      
     },
     country: {
       type: String,

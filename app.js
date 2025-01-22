@@ -5,6 +5,19 @@ import { Server } from 'socket.io';
 import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from 'dotenv';
+import googleAuthRoutes from "./routes/googleauth.routes.js"
+import {auth} from "./middleware/auth.js"
+// import passport from "passport";
+// import session from "express-session";
+// import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+
+
+
+
+
+
+
+
 
 import badgeRouter from "./routes/badge.route.js";
 import commentRouter from "./routes/comment.route.js";
@@ -20,6 +33,8 @@ import quizRouter from "./routes/quiz.route.js";
 import storyRouter from "./routes/story.route.js";
 import userRouter from "./routes/user.route.js"; 
 import challangesRoute from "./routes/challengesFile.route.js";
+import { access } from "fs";
+import { profile } from "console";
 
 dotenv.config();
 const app = express();
@@ -31,6 +46,13 @@ const io = new Server(server, {
         allowedHeaders: ["Content-Type"],
     }
 });
+app.use(googleAuthRoutes);
+
+// Secure Route Example
+app.get("/profile", auth, (req, res) => {
+  res.json({ user: req.user }); // Access user data added by the `auth` middleware
+});
+
 
 app.use(cors());
 app.use(bodyParser.json());
