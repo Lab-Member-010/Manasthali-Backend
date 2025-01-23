@@ -1,63 +1,71 @@
-import Community from '../model/community.model.js'; 
-import Group from '../model/group.model.js'; 
+import Community from '../models/community.model.js';
 
 // Get all communities
 export const getAllCommunities = async (req, res) => {
-  try {
-    const communities = await Community.find();
-    res.status(200).json(communities);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: 'Internal Server Error' });
-  }
+    try {
+        const communities = await Community.find(); // Fetches all communities from the database
+        return res.status(200).json({ success: true, data: communities });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "Failed to fetch communities" });
+    }
 };
 
-// Get community details
+// Get details of a specific community
 export const getCommunityDetails = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const community = await Community.findById(id);
-    if (!community) {
-      return res.status(404).json({ message: 'Community not found' });
+    const { id } = req.params; // The community ID is passed in the URL
+
+    try {
+        const community = await Community.findById(id); // Find community by ID
+        if (!community) {
+            return res.status(404).json({ success: false, message: "Community not found" });
+        }
+        return res.status(200).json({ success: true, data: community });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "Failed to fetch community details" });
     }
-    res.status(200).json(community);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: 'Internal Server Error' });
-  }
 };
 
-// Get groups in community
+// Get all groups in a specific community (assuming there is a `Group` model associated with `Community`)
 export const getGroupsInCommunity = async (req, res) => {
-  try {
     const { id } = req.params;
-    const groups = await Group.find({ communityId: id });
-    if (!groups || groups.length === 0) {
-      return res.status(404).json({ message: 'No groups found in this community' });
+
+    try {
+        // Assuming you have a separate Group model where each group references the community by communityId
+        const groups = await Group.find({ communityId: id }); // Fetch all groups in the given community
+        if (!groups) {
+            return res.status(404).json({ success: false, message: "No groups found in this community" });
+        }
+        return res.status(200).json({ success: true, data: groups });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "Failed to fetch groups in community" });
     }
-    res.status(200).json(groups);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: 'Internal Server Error' });
-  }
 };
 
 // Create a new community
 export const createCommunity = async (req, res) => {
-  const { communityId, name, description, icon, personality_type, created_by } = req.body;
+    const { name, description, icon, personality_type } = req.body;
 
-  // Check for duplicate community name
-  const existingCommunity = await Community.findOne({ name });
-  if (existingCommunity) {
-    return res.status(400).json({ message: 'Community with that name already exists' });
-  }
+    if (!name) {
+        return res.status(400).json({ success: false, message: "Community name is required" });
+    }
 
-  try {
-    const newCommunity = new Community({ communityId, name, description, icon, personality_type, created_by });
-    await newCommunity.save();
-    res.status(201).json(newCommunity);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: 'Internal Server Error' });
-  }
+    try {
+        const newCommunity = new Community({
+            name,
+            description,
+            icon,
+            personality_type,
+            group_count: 0 // Initial group count
+        });
+
+        // Save the new community to the database
+        const savedCommunity = await newCommunity.save();
+        return res.status(201).json({ success: true, data: savedCommunity });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "Failed to create community" });
+    }
 };
