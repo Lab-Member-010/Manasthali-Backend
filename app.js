@@ -6,7 +6,6 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from 'dotenv';
 
-
 import badgeRouter from "./routes/badge.route.js";
 import commentRouter from "./routes/comment.route.js";
 import communityRouter from "./routes/community.route.js";
@@ -34,6 +33,7 @@ const io = new Server(server, {
 });
 
 app.use(cors());
+app.use('/uploads', express.static('uploads'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
