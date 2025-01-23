@@ -10,10 +10,10 @@ import dotenv from 'dotenv';
 import badgeRouter from "./routes/badge.route.js";
 import commentRouter from "./routes/comment.route.js";
 // import communityRouter from "./routes/community.route.js";
-import gameRouter from "./routes/game.route.js";
+// import gameRouter from "./routes/game.route.js";
 import groupRouter from "./routes/group.route.js";
 import groupmessageRouter from "./routes/groupmessage.route.js";
-import leaderboardRouter from "./routes/leaderboard.route.js";
+// import leaderboardRouter from "./routes/leaderboard.route.js";
 import mentalCoachRouter from "./routes/mentalCoach.route.js";
 import messageRouter from "./routes/message.route.js";
 import notificationRouter from "./routes/notification.route.js";
@@ -46,10 +46,10 @@ mongoose.connect(process.env.DB_URI)
     // Add all the routes
     app.use("/comments", commentRouter);
     // app.use("/communities", communityRouter);
-    app.use("/games", gameRouter);
+    // app.use("/games", gameRouter);
     app.use("/groups", groupRouter);
     app.use("/groupchat", groupmessageRouter);
-    app.use("/leaderboards", leaderboardRouter);
+    // app.use("/leaderboards", leaderboardRouter);
     app.use("/mentalCoach", mentalCoachRouter);
     app.use("/message", messageRouter);
     app.use("/notifications", notificationRouter);
