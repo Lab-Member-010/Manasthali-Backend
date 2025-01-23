@@ -1,6 +1,5 @@
 import { validationResult } from "express-validator";
 import { User } from "../model/user.model.js";
-import { Quiz } from "../model/quiz.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { myOPT, sendEmail } from "../mailer/mymail.js";
@@ -285,8 +284,9 @@ const generateToken = (userId) => {
 // get user details
 export const getUserById = async (req, res) => {
     try {
-        const user = await User.findOne({ userId: req.params.id });
-
+        console.log(req.params)
+        const user = await User.findById({_id:req.params.id });
+        console.log(user)
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
