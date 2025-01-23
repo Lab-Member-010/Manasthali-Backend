@@ -1,19 +1,22 @@
 import Story from '../model/story.model.js';
 
 export const uploadStory = async (req, res) => {
-  // Logic to upload a new story
-  try{
-   const {userId,media,caption}=req.body;
-   const story=await Story({userId,media,caption});
-   const newstory=await story.save();
-   res.status(200).json(newstory);
-  }catch(err){
-    console.log(err);
-    res.status(500).json({error:"internal server"})
-    
+  try {
+    const { userId, caption } = req.body;
+
+    // Check if a file was uploaded
+    const media = req.file ? req.file.filename : null;
+
+    // Create and save the story
+    const story = new Story({ userId, media, caption });
+    const newStory = await story.save();
+
+    res.status(200).json(newStory);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
-
 export const getAllStories = async (req, res) => {
   try {
     const stories = await Story.find().populate("userId", "name email").exec();  

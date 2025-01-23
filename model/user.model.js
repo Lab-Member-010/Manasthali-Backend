@@ -42,16 +42,7 @@ const userSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
-    follow_requests: [
-      {
-        sender: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-        status: {
-          type: String,
-          enum: ["pending", "accepted", "rejected"],
-          default: "pending",
-        },
-      },
-    ],
+    
     gender: {
       type: String,
       required: false,
@@ -71,12 +62,7 @@ const userSchema = new mongoose.Schema(
         ref: "Badge",
       },
     ],
-    privacy_settings: {
-      profile_visibility: {
-        type: String,
-        enum: ["public", "private"],
-      },
-    },
+   
     isActive: {
       type: Boolean,
       default: true,
