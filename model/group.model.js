@@ -36,10 +36,10 @@ const groupSchema = new mongoose.Schema({
   created_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   messages: [groupMessageSchema],
-  // communityId: { type: mongoose.Schema.Types.ObjectId, ref: 'Community' }
+  communityId: { type: mongoose.Schema.Types.ObjectId, ref: 'Community' }
 }, {
   timestamps: true
 });
 
 export const Group = mongoose.model('Group', groupSchema);
-export  default mongoose.model('GroupMessage', groupMessageSchema);
+export default mongoose.model('GroupMessage', groupMessageSchema);

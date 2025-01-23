@@ -6,14 +6,11 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from 'dotenv';
 
-
 import badgeRouter from "./routes/badge.route.js";
 import commentRouter from "./routes/comment.route.js";
-// import communityRouter from "./routes/community.route.js";
-// import gameRouter from "./routes/game.route.js";
+import communityRouter from "./routes/community.route.js";
 import groupRouter from "./routes/group.route.js";
 import groupmessageRouter from "./routes/groupmessage.route.js";
-// import leaderboardRouter from "./routes/leaderboard.route.js";
 import mentalCoachRouter from "./routes/mentalCoach.route.js";
 import messageRouter from "./routes/message.route.js";
 import notificationRouter from "./routes/notification.route.js";
@@ -36,6 +33,7 @@ const io = new Server(server, {
 });
 
 app.use(cors());
+app.use('/uploads', express.static('uploads'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -45,11 +43,9 @@ mongoose.connect(process.env.DB_URI)
     
     // Add all the routes
     app.use("/comments", commentRouter);
-    // app.use("/communities", communityRouter);
-    // app.use("/games", gameRouter);
+    app.use("/communities", communityRouter);
     app.use("/groups", groupRouter);
     app.use("/groupchat", groupmessageRouter);
-    // app.use("/leaderboards", leaderboardRouter);
     app.use("/mentalCoach", mentalCoachRouter);
     app.use("/message", messageRouter);
     app.use("/notifications", notificationRouter);
@@ -58,7 +54,7 @@ mongoose.connect(process.env.DB_URI)
     app.use("/story", storyRouter);
     app.use("/badges", badgeRouter);
     app.use("/users", userRouter);
-    app.use("/challange", challengesRoute);
+    app.use("/challenge", challengesRoute);
 
     // Socket.IO for real-time group chat functionality
     io.on('connection', (socket) => {
