@@ -325,84 +325,97 @@ export const updateUserById = async (req, res) => {
         console.error(err);
         return res.status(500).json({ error: "Internal Server Error" });
     }
+     
 };
 
 export const contactUpdateById=async(req,res,next)=>{
-    try{
-    const{id}=req.params;
-    const{contact}=req.body;
-    if(!contact){
-       return res.status(400).json({message:"contact is required"})
-    }
-   const newupdate=await User.findOneAndUpdate(
-          {_id:id},
-          {contact},
-          {new:true}
-);
-          if(!newupdate){
-            res.status(404).json({message:"user not found"})
-          }
-          return res.status(200).json({message:"Contact updated successfully",
-            user:newupdate});
-    }catch(error){
-        console.log(error);
-        res.status(500).json({error:"internal server error"})
-    }
+    try {
+        const { id } = req.params;
+        const { contact } = req.body;
+    
+        if (!contact) {
+          return res.status(400).json({ message: "Contact is required" });
+        }
+    
+        const updatedUser = await User.findOneAndUpdate(
+          { _id: id },
+          { contact },
+          { new: true }
+        );
+    
+        if (!updatedUser) {
+          return res.status(404).json({ message: "User not found" });
+        }
+    
+        return res.status(200).json({
+          success: true,
+          message: "Contact updated successfully",
+          user: updatedUser,
+        });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal server error" });
+      }
 }
 
 export const DobUpdateById=async(req,res,next)=>{
-    try{
-    const {id}=req.params;
-    const {dob}=req.body;
-if(!dob){
-  return  res.status(400).json({message:"Date of Birth is required"})
-}
-const dobupdate=await User.findOneAndUpdate(
-    {_id:id},
-    {dob},
-    {new:true}
-);
-if(!dobupdate){
-    return res.status(404).json({ error: "User not found" });
-};
-return res.status(200).json({
-    message: "Date of Birth updated successfully",
-    user:dobupdate,
-});
-    }catch(error){
-        console.log(error);
-        res.status(500).json({error:"internal server error"})
-        
-    }
+    try {
+        const { id } = req.params;
+        const { dob } = req.body;
+    
+        if (!dob) {
+          return res.status(400).json({ message: "Date of Birth is required" });
+        }
+    
+        const updatedUser = await User.findOneAndUpdate(
+          { _id: id },
+          { dob },
+          { new: true }
+        );
+    
+        if (!updatedUser) {
+          return res.status(404).json({ message: "User not found" });
+        }
+    
+        return res.status(200).json({
+          success: true,
+          message: "Date of Birth updated successfully",
+          user: updatedUser,
+        });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal server error" });
+      }
 }
 
 export const genderUpdate=async(req,res,next)=>{
     try {
         const { id } = req.params;
         const { gender } = req.body;
-
+    
         if (!gender) {
-            return res.status(400).json({ error: "Gender is required" });
+          return res.status(400).json({ message: "Gender is required" });
         }
-
+    
         const updatedUser = await User.findOneAndUpdate(
-            { _id: id },
-            { gender },
-            { new: true }
+          { _id: id },
+          { gender },
+          { new: true }
         );
-
+    
         if (!updatedUser) {
-            return res.status(404).json({ error: "User not found" });
+          return res.status(404).json({ message: "User not found" });
         }
-
+    
         return res.status(200).json({
-            message: "Gender updated successfully",
-            user: updatedUser,
+          success: true,
+          message: "Gender updated successfully",
+          user: updatedUser,
         });
-    } catch (err) {
-        console.error(err);
-        return res.status(500).json({ error: "Internal Server Error" });
-    }
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal server error" });
+      }
 }
 
 //delete user
