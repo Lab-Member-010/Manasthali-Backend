@@ -285,7 +285,7 @@ const generateToken = (userId) => {
 export const getUserById = async (req, res) => {
     try {
         console.log(req.params)
-        const user = await User.findById({_id:req.params.id });
+        const user = await User.findById(req.params.id);
         console.log(user)
         if (!user) {
             return res.status(404).json({ error: "User not found" });
@@ -605,5 +605,28 @@ export const unfollowUser = async (req, res) => {
     } catch (err) {
         console.error(err);
         return res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+// Get all users except you
+export const getAllUsersExceptOne = async (req, res) => {
+    try {
+        const excludedId = req.params.id; // Assuming you pass the ID of the user to exclude
+        const users = await User.find({ _id: { $ne: excludedId } });
+
+        if (!users || users.length === 0) {
+            return res.status(404).json({
+                message: "No users found",
+            });
+        }
+
+        return res.status(200).json({
+            users,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: "Server error, could not retrieve users",
+        });
     }
 };

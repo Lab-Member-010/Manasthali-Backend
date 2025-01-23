@@ -14,7 +14,8 @@ import {
   unfollowUser,
   verifyOtp,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  getAllUsersExceptOne
 } from "../controller/user.controller.js";
 import { body } from "express-validator";
 import { auth } from "../middleware/auth.js";
@@ -83,5 +84,8 @@ router.post("/follow", auth, followUser);
 
 // Unfollow a user
 router.post("/unfollow", auth, unfollowUser);
+
+// get all users
+router.get("/get-all-users-except/:id",auth,getAllUsersExceptOne);
 
 export default router;

@@ -2,7 +2,7 @@ import express from 'express';
 import upload from '../middleware/uploadsdb.js';
 import { auth } from '../middleware/auth.js';
 
-import { createPost, getPostDetails, updatePost, deletePost, likePost, unlikePost, getPostComments, sharePost,addComment } from '../controller/post.controller.js';
+import { createPost, getPostDetails, updatePost, deletePost, likePost, unlikePost, getPostComments, sharePost,addComment,getAllPosts } from '../controller/post.controller.js';
 
 const router = express.Router();
 
@@ -15,5 +15,6 @@ router.post('/posts/:id/unlike',auth, unlikePost);
 router.post('/post/:id/addcomment',auth,addComment)
 router.get('/post/:id/comments',auth, getPostComments);
 router.post('/posts/:id/share', auth,sharePost);
+router.get('/all-posts/:id',auth,getAllPosts);
 
 export default router;
