@@ -42,4 +42,4 @@ const groupSchema = new mongoose.Schema({
 });
 
 export const Group = mongoose.model('Group', groupSchema);
-export  default mongoose.model('GroupMessage', groupMessageSchema);
+export default mongoose.model('GroupMessage', groupMessageSchema);

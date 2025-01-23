@@ -9,7 +9,6 @@ import dotenv from 'dotenv';
 import badgeRouter from "./routes/badge.route.js";
 import commentRouter from "./routes/comment.route.js";
 import communityRouter from "./routes/community.route.js";
-import communityRouter from "./routes/community.route.js";
 import groupRouter from "./routes/group.route.js";
 import groupmessageRouter from "./routes/groupmessage.route.js";
 import mentalCoachRouter from "./routes/mentalCoach.route.js";

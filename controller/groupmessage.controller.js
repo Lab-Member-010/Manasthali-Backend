@@ -1,5 +1,4 @@
-import GroupMessage from '../model/groupmessage.model.js';
-import Group from '../model/group.model.js';
+import GroupMessage ,{Group} from '../model/group.model.js';
 
 // Function to send a group message
 export const sendGroupMessage = async (req, res) => {
