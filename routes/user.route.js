@@ -14,8 +14,7 @@ import {
   unfollowUser,
   verifyOtp,
   forgotPassword,
-  resetPassword,
-  getAllUsersExceptOne
+  resetPassword,getAllUsersExceptOne
 } from "../controller/user.controller.js";
 import { body } from "express-validator";
 import { auth } from "../middleware/auth.js";
@@ -58,6 +57,10 @@ router.post("/reset-password",
 
 // Get user details by ID
 router.get("/:id", auth, getUserById);
+
+//Get all user
+// router.get("/viewuser",auth,getalluser)
+router.get("/get-all-users-except/:id",auth,getAllUsersExceptOne);
 
 // Update user details
 router.put("/:id", auth,upload.single("profile_picture"), updateUserById);

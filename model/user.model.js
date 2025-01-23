@@ -42,6 +42,7 @@ const userSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
+    
     gender: {
       type: String,
       required: false,
@@ -61,6 +62,7 @@ const userSchema = new mongoose.Schema(
         ref: "Badge",
       },
     ],
+   
     isActive: {
       type: Boolean,
       default: true,

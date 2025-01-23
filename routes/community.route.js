@@ -3,7 +3,7 @@ import { getAllCommunities, getCommunityDetails, getGroupsInCommunity, createCom
 import {auth} from "../middleware/auth.js";
 const router = express.Router();
 
-router.get('/communities',auth , getAllCommunities);
+router.get('/view',auth , getAllCommunities);
 router.get('/communities/:id',auth , getCommunityDetails);
 router.get('/communities/:id/groups',auth , getGroupsInCommunity);
 router.post('/create',auth , createCommunity);

@@ -433,6 +433,12 @@ export const deleteUserById = async (req, res) => {
         return res.status(500).json({ error: "Internal Server Error" });
     }
 };
+//get all user
+
+
+
+
+
 
 //get list of all followers
 export const getUserFollowers = async (req, res) => {
