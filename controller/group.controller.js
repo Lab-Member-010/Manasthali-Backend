@@ -3,7 +3,7 @@ import Community from '../model/community.model.js';
 
 // Create a new group
 export const createGroup = async (req, res) => {
-  const { name, description,members } = req.body;
+  const { name, description, members, communityId } = req.body;
 
   // Check if user is authenticated (req.user is populated by the auth middleware)
   if (!req.user) {
@@ -41,13 +41,16 @@ export const getGroupDetails = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const group = await Group.findById(id).populate('communityId'); // Populate related data
+    const group = await Group.findById(id)
+      .populate('communityId')
+      .populate('members', 'name email'); // Populate member details
+
     if (!group) {
       return res.status(404).json({ message: 'Group not found' });
     }
     res.json(group);
   } catch (err) {
-     console.log(err);
+    console.log(err);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -57,13 +60,19 @@ export const updateGroup = async (req, res) => {
   const { id } = req.params;
   const { name, description, communityId } = req.body;
 
-  // Check if user is authorized to update (e.g., creator or admin)
   try {
-    const group = await Group.findByIdAndUpdate(id, { name, description, communityId }, { new: true }); // Return updated document
-    if (!group) {
+    const group = await Group.findById(id);
+
+    // Authorization check: Make sure the user is the creator or admin
+    if (group.createdBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Unauthorized: You are not the creator of this group" });
+    }
+
+    const updatedGroup = await Group.findByIdAndUpdate(id, { name, description, communityId }, { new: true });
+    if (!updatedGroup) {
       return res.status(404).json({ message: 'Group not found' });
     }
-    res.json(group);
+    res.json(updatedGroup);
   } catch (err) {
     console.log(err.message);
     res.status(500).json({ message: 'Internal Server Error' });
@@ -73,8 +82,15 @@ export const updateGroup = async (req, res) => {
 // Delete a group
 export const deleteGroup = async (req, res) => {
   const { id } = req.params;
-  // Check if user is authorized to delete (e.g., creator or admin)
+
   try {
+    const group = await Group.findById(id);
+
+    // Authorization check: Make sure the user is the creator or admin
+    if (group.createdBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Unauthorized: You are not the creator of this group" });
+    }
+
     const deletedGroup = await Group.findByIdAndDelete(id);
     if (!deletedGroup) {
       return res.status(404).json({ message: 'Group not found' });
@@ -89,22 +105,21 @@ export const deleteGroup = async (req, res) => {
 // Join a group
 export const joinGroup = async (req, res) => {
   try {
-    const { id } = req.params; // Group ID from the URL
-    const userId = req.user._id; // User ID from authentication middleware
-    console.log(req.params);
-    console.log(req.user._id);
+    const { id } = req.params;
+    const userId = req.user._id;
 
-    // Find the group by ID
     const group = await Group.findById(id);
     if (!group) {
       return res.status(404).json({ message: 'Group not found' });
     }
 
     // Add the user to the group members list if not already a member
-    if (!group.members.includes(userId)) {
-      group.members.push(userId);
-      await group.save();
+    if (group.members.includes(userId)) {
+      return res.status(400).json({ message: 'You are already a member of this group' });
     }
+
+    group.members.push(userId);
+    await group.save();
     res.status(200).json({ message: 'Successfully joined the group', group });
   } catch (err) {
     console.error(err.message);
@@ -115,16 +130,19 @@ export const joinGroup = async (req, res) => {
 // Leave a group
 export const leaveGroup = async (req, res) => {
   try {
-    const { id } = req.params; // Group ID from the URL
-    const userId = req.user._id; // User ID from authentication middleware
+    const { id } = req.params;
+    const userId = req.user._id;
 
-    // Find the group by ID
     const group = await Group.findById(id);
     if (!group) {
       return res.status(404).json({ message: 'Group not found' });
     }
 
-    // Remove the user from the group members list
+    // Check if the user is already a member before attempting to leave
+    if (!group.members.includes(userId)) {
+      return res.status(400).json({ message: 'You are not a member of this group' });
+    }
+
     group.members = group.members.filter(memberId => memberId.toString() !== userId.toString());
     await group.save();
     res.status(200).json({ message: 'Successfully left the group', group });
@@ -137,9 +155,9 @@ export const leaveGroup = async (req, res) => {
 // Get group members
 export const getGroupMembers = async (req, res) => {
   try {
-    const { id } = req.params; // Group ID from the URL
-    // Find the group by ID and populate the members field
-    const group = await Group.findById(id).populate('members', 'name email'); // Adjust fields to be populated
+    const { id } = req.params;
+
+    const group = await Group.findById(id).populate('members', 'name email');
     if (!group) {
       return res.status(404).json({ message: 'Group not found' });
     }

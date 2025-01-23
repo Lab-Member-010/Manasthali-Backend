@@ -36,7 +36,7 @@ const groupSchema = new mongoose.Schema({
   created_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   messages: [groupMessageSchema],
-  // communityId: { type: mongoose.Schema.Types.ObjectId, ref: 'Community' }
+  communityId: { type: mongoose.Schema.Types.ObjectId, ref: 'Community' }
 }, {
   timestamps: true
 });

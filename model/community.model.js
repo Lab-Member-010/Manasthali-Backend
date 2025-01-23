@@ -8,7 +8,6 @@ const communitySchema = new mongoose.Schema({
     description: String,
     icon: String,
     personality_type: String,
-    created_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User ' },
     group_count: { type: Number, default: 0 }
 }, {
     timestamps: true
