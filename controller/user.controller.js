@@ -610,3 +610,30 @@ export const getAllUsersExceptOne = async (req, res) => {
         });
     }
 };
+
+export const bioUpdateById=async(req,res,next)=>{
+  try{
+const{id}=req.params;
+const{bio}=req.body;
+if (!bio) {
+  return res.status(400).json({ message: "bio is required" });
+}
+const updatebio=await User.findOneAndDelete(
+  {_id:id},
+   {bio},
+  {new:true}
+);
+if (!updatebio) {
+  return res.status(404).json({ message: "User not found" });
+}
+
+return res.status(200).json({
+  success: true,
+  message: "bio updated successfully",
+  user: updatebio,
+});
+  }catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+   }
+}
