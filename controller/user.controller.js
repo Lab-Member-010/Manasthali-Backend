@@ -474,6 +474,8 @@ export const getUserFollowing = async (req, res) => {
 };
 
 
+  
+
 export const followUser = async (req, res) => {
     try {
       const { userId, userIdToFollow } = req.body;
