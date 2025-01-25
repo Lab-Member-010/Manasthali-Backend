@@ -434,25 +434,20 @@ export const deleteUserById = async (req, res) => {
         return res.status(500).json({ error: "Internal Server Error" });
     }
 };
+
+
 //get all user
-
-
-
-
-
-
-//get list of all followers
 export const getUserFollowers = async (req, res) => {
     try {
-        const user = await User.findOne({ userId: req.params.id }).populate(
-            "followers",
-            "username userId"
-        );
+        // Find the user by their ID
+        const user = await User.findById(req.params.id).populate("followers");
 
+        // If the user isn't found, return a 404 error
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
 
+        // Return the list of followers if the user is found
         return res.status(200).json({ followers: user.followers });
     } catch (err) {
         console.error(err);
@@ -460,13 +455,12 @@ export const getUserFollowers = async (req, res) => {
     }
 };
 
+
 //get list of all following
 export const getUserFollowing = async (req, res) => {
     try {
-        const user = await User.findOne({ userId: req.params.id }).populate(
-            "following",
-            "username userId"
-        );
+        // Find the user by _id (assuming the ID is passed as req.params.id)
+        const user = await User.findById(req.params.id).populate("following");
 
         if (!user) {
             return res.status(404).json({ error: "User not found" });
@@ -479,8 +473,6 @@ export const getUserFollowing = async (req, res) => {
     }
 };
 
-
-  
 
 export const followUser = async (req, res) => {
     try {
