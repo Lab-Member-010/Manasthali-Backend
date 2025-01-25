@@ -60,7 +60,6 @@ router.post("/reset-password",
 router.get("/:id", auth, getUserById);
 
 //Get all user
-// router.get("/viewuser",auth,getalluser)
 router.get("/get-all-users-except/:id",auth,getAllUsersExceptOne);
 
 // Update user details
@@ -74,6 +73,7 @@ router.put("/:id/dob",auth,DobUpdateById);
 
 // Update user gender
 router.put("/:id/gender",auth,genderUpdate);
+
 // Delete a user account
 router.delete("/:id", auth, deleteUserById);
 
