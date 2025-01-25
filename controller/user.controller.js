@@ -30,7 +30,7 @@ export const SignUp = async (request, response, next) => {
         // Encrypt password
         const saltKey = bcrypt.genSaltSync(10);
         const encryptedPassword = bcrypt.hashSync(password, saltKey);
-        // Create a new user with `verified` set to false
+        // Create a new user with verified set to false
         const user = new User({
             email,
             username,
@@ -473,7 +473,6 @@ export const getUserFollowing = async (req, res) => {
     }
 };
 
-
 export const followUser = async (req, res) => {
     try {
       const { userId, userIdToFollow } = req.body;
@@ -608,3 +607,38 @@ export const getAllUsersExceptOne = async (req, res) => {
         });
     }
 };
+
+export const bioUpdateById= async (req,res)=>{
+    try {
+        const { id } = req.params; // Extract user ID from params
+        const { bio } = req.body;  // Extract bio from request body
+
+        // Check if bio is provided
+        if (!bio) {
+            return res.status(400).json({ message: "Bio is required" });
+        }
+
+        // Update the user's bio
+        const updatedUser = await User.findOneAndUpdate(
+            { _id: id },              // Find the user by ID
+            { bio: bio },             // Update the bio field
+            { new: true }             // Return the updated user document
+        );
+
+        // If the user is not found
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Return the updated user with success message
+        return res.status(200).json({
+            success: true,
+            message: "Bio updated successfully",
+            user: updatedUser,
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+}

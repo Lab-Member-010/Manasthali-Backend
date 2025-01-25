@@ -7,6 +7,7 @@ import {
   contactUpdateById,
   DobUpdateById,
   genderUpdate,
+  bioUpdateById,
   deleteUserById,
   getUserFollowers,
   getUserFollowing,
@@ -59,7 +60,6 @@ router.post("/reset-password",
 router.get("/:id", auth, getUserById);
 
 //Get all user
-// router.get("/viewuser",auth,getalluser)
 router.get("/get-all-users-except/:id",auth,getAllUsersExceptOne);
 
 // Update user details
@@ -71,8 +71,12 @@ router.put("/:id/contact",auth,contactUpdateById)
 // Update user DOB
 router.put("/:id/dob",auth,DobUpdateById);
 
+// update user bio
+router.put("/:id/bio",auth,bioUpdateById);
+
 // Update user gender
 router.put("/:id/gender",auth,genderUpdate);
+
 // Delete a user account
 router.delete("/:id", auth, deleteUserById);
 
