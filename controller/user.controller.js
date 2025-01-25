@@ -1,11 +1,11 @@
 import { validationResult } from "express-validator";
 import { User } from "../model/user.model.js";
-import { Quiz } from "../model/quiz.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { myOPT, sendEmail } from "../mailer/mymail.js";
 import crypto from "crypto";
 import dotenv from "dotenv";
+import { log } from "console";
 
 dotenv.config();
 
@@ -285,8 +285,9 @@ const generateToken = (userId) => {
 // get user details
 export const getUserById = async (req, res) => {
     try {
-        const user = await User.findOne({ userId: req.params.id });
-
+        console.log(req.params)
+        const user = await User.findById(req.params.id);
+        console.log(user)
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
@@ -433,6 +434,12 @@ export const deleteUserById = async (req, res) => {
         return res.status(500).json({ error: "Internal Server Error" });
     }
 };
+//get all user
+
+
+
+
+
 
 //get list of all followers
 export const getUserFollowers = async (req, res) => {
@@ -473,35 +480,44 @@ export const getUserFollowing = async (req, res) => {
 };
 
 
-export const followUser = async (req, res, next) => {
+  
 
-
+export const followUser = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id);
-        const currentUser = await User.findById(req.user.id);  // From token
-
-        if (!user || !currentUser) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        if (user.followers.includes(req.user.id)) {
-            return res.status(400).json({ message: 'You already follow this user' });
-        }
-
-        user.followers.push(req.user.id);
-        currentUser.following.push(req.params.id);
-
-        await user.save();
-        await currentUser.save();
-
-        res.status(200).json({ message: 'User followed successfully' });
-    } catch (err) {
-        res.status(500).json({ message: 'Error following user', error: err.message });
+      const { userId, userIdToFollow } = req.body;
+      console.log(userId);
+      console.log(userIdToFollow);
+  
+      if (userId === userIdToFollow) {
+        return res.status(400).json({ message: "You cannot follow yourself" });
+      }
+  
+      const user = await User.findById(userId);
+      const targetUser = await User.findById(userIdToFollow);
+  
+      if (!user || !targetUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      if (user.following.includes(userIdToFollow)) {
+        return res.status(409).json({ message: "You already follow this user" });
+      }
+  
+      // Add to the user's following list
+      user.following.push(userIdToFollow);
+      await user.save();
+  
+      // Add to the target user's followers list
+      targetUser.followers.push(userId);
+      await targetUser.save();
+  
+      res.status(200).json({ message: "Followed successfully" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Server error" });
     }
-
-};
-
-
+  };
+  
 export const sendFollowRequest = async (req, res) => {
     try {
         const { senderId, receiverId } = req.body;
@@ -555,36 +571,6 @@ export const handleFollowRequest = async (req, res) => {
 };
 
 
-
-
-
-//follow user
-// export const followUser = async (req, res) => {
-//     try {
-//         const currentUser = await User.findById(req.user.payload); 
-//         const targetUser = await User.findById(req.params.id); 
-
-//         if (!currentUser || !targetUser) {
-//             return res.status(404).json({ error: "User not found" });
-//         }
-
-//         if (!currentUser.following.includes(targetUser._id)) {
-//             currentUser.following.push(targetUser._id);
-//             await currentUser.save();
-//         }
-
-//         if (!targetUser.followers.includes(currentUser._id)) {
-//             targetUser.followers.push(currentUser._id);
-//             await targetUser.save();
-//         }
-
-//         return res.status(200).json({ message: "User followed successfully" });
-//     } catch (err) {
-//         console.error(err);
-//         return res.status(500).json({ error: "Internal Server Error" });
-//     }
-// };
-
 // //unfollow user
 export const unfollowUser = async (req, res) => {
     try {
@@ -605,5 +591,28 @@ export const unfollowUser = async (req, res) => {
     } catch (err) {
         console.error(err);
         return res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+// Get all users except you
+export const getAllUsersExceptOne = async (req, res) => {
+    try {
+        const excludedId = req.params.id; // Assuming you pass the ID of the user to exclude
+        const users = await User.find({ _id: { $ne: excludedId } });
+
+        if (!users || users.length === 0) {
+            return res.status(404).json({
+                message: "No users found",
+            });
+        }
+
+        return res.status(200).json({
+            users,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: "Server error, could not retrieve users",
+        });
     }
 };

@@ -2,9 +2,10 @@ import mongoose from "mongoose";
 import {ChallengesFile} from "../model/challengesFile.model.js";
 import fs from "fs";
 import dotenv from "dotenv";
-dotenv.config();
+dotenv.config({ path:"../.env"});
 
 // Connect to MongoDB
+console.log(process.env.DB_URI)
 mongoose.connect(process.env.DB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
