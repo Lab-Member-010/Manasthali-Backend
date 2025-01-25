@@ -7,6 +7,7 @@ import {
   contactUpdateById,
   DobUpdateById,
   genderUpdate,
+  bioUpdateById,
   deleteUserById,
   getUserFollowers,
   getUserFollowing,
@@ -71,6 +72,8 @@ router.put("/:id/contact",auth,contactUpdateById)
 // Update user DOB
 router.put("/:id/dob",auth,DobUpdateById);
 
+
+router.put("/:id/bio",auth,bioUpdateById);
 // Update user gender
 router.put("/:id/gender",auth,genderUpdate);
 // Delete a user account
