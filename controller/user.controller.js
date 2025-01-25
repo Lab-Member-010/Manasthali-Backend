@@ -608,3 +608,6 @@ export const getAllUsersExceptOne = async (req, res) => {
     }
 };
 
+export const bioUpdateById= async (req,res)=>{
+    //logic
+}
