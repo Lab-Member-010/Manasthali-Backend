@@ -437,41 +437,82 @@ export const deleteUserById = async (req, res) => {
 
 
 //get all user
-export const getUserFollowers = async (req, res) => {
-    try {
-        // Find the user by their ID
-        const user = await User.findById(req.params.id).populate("followers");
+// export const getUserFollowers = async (req, res) => {
+//     try {
+//         // Find the user by their ID
+//         const user = await User.findById(req.params.id).populate("followers");
 
-        // If the user isn't found, return a 404 error
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
+//         // If the user isn't found, return a 404 error
+//         if (!user) {
+//             return res.status(404).json({ error: "User not found" });
+//         }
 
-        // Return the list of followers if the user is found
-        return res.status(200).json({ followers: user.followers });
-    } catch (err) {
-        console.error(err);
-        return res.status(500).json({ error: "Internal Server Error" });
+//         // Return the list of followers if the user is found
+//         return res.status(200).json({ followers: user.followers });
+//     } catch (err) {
+//         console.error(err);
+//         return res.status(500).json({ error: "Internal Server Error" });
+//     }
+// };
+
+
+// //get list of all following
+// export const getUserFollowing = async (req, res) => {
+//     try {
+//         // Find the user by _id (assuming the ID is passed as req.params.id)
+//         const user = await User.findById(req.params.id).populate("following");
+
+//         if (!user) {
+//             return res.status(404).json({ error: "User not found" });
+//         }
+
+//         return res.status(200).json({ following: user.following });
+//     } catch (err) {
+//         console.error(err);
+//         return res.status(500).json({ error: "Internal Server Error" });
+//     }
+// };
+
+
+ // Fetch followers with username and profile picture
+ export const getUserFollowers = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).populate(
+      "followers",
+      "username profile_picture"
+    );
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
     }
+
+    return res.status(200).json({ followers: user.followers || [] });
+  } catch (err) {
+    console.error("Error fetching followers:", err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
 };
 
-
-//get list of all following
+// // Fetch following users with username and profile picture
 export const getUserFollowing = async (req, res) => {
-    try {
-        // Find the user by _id (assuming the ID is passed as req.params.id)
-        const user = await User.findById(req.params.id).populate("following");
+  try {
+    const user = await User.findById(req.params.id).populate(
+      "following",
+      "username profile_picture"
+    );
 
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
-
-        return res.status(200).json({ following: user.following });
-    } catch (err) {
-        console.error(err);
-        return res.status(500).json({ error: "Internal Server Error" });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
     }
+
+    return res.status(200).json({ following: user.following || [] });
+  } catch (err) {
+    console.error("Error fetching following users:", err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
 };
+
+
 
 export const followUser = async (req, res) => {
     try {
@@ -609,5 +650,36 @@ export const getAllUsersExceptOne = async (req, res) => {
 };
 
 export const bioUpdateById= async (req,res)=>{
-    //logic
+    try {
+        const { id } = req.params; // Extract user ID from params
+        const { bio } = req.body;  // Extract bio from request body
+
+        // Check if bio is provided
+        if (!bio) {
+            return res.status(400).json({ message: "Bio is required" });
+        }
+
+        // Update the user's bio
+        const updatedUser = await User.findOneAndUpdate(
+            { _id: id },              // Find the user by ID
+            { bio: bio },             // Update the bio field
+            { new: true }             // Return the updated user document
+        );
+
+        // If the user is not found
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Return the updated user with success message
+        return res.status(200).json({
+            success: true,
+            message: "Bio updated successfully",
+            user: updatedUser,
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
 }
