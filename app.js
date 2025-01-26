@@ -60,21 +60,21 @@ mongoose.connect(process.env.DB_URI)
     io.on('connection', (socket) => {
       console.log('A user connected');
 
-      // Event to join a room (group)
+      // Event to join a room (group chat)
       socket.on('join-room', (roomId) => {
         socket.join(roomId);
         console.log(`User joined room: ${roomId}`);
       });
 
-      // Event to send a message to a specific room (group chat)
-      socket.on('send-message', (data) => {
+      // Event to send a message in a group (group chat)
+      socket.on('send-message-group', (data) => {
         try {
           if (!data.roomId || !data.message || !data.senderId) {
-            throw new Error('Room ID, message or sender ID missing');
+            throw new Error('Room ID, message, or sender ID missing');
           }
 
-          // Broadcast the message to the specific room
-          io.to(data.roomId).emit('receive-message', {
+          // Broadcast the message to the specific room (group chat)
+          io.to(data.roomId).emit('receive-message-group', {
             message: data.message,
             senderId: data.senderId,
             timestamp: new Date().toISOString(),
@@ -85,12 +85,32 @@ mongoose.connect(process.env.DB_URI)
         }
       });
 
-      // Event to leave a room
+      // Event to send a message to a specific user (one-on-one chat)
+      socket.on('send-message', (data) => {
+        try {
+          if (!data.receiverId || !data.message || !data.senderId) {
+            throw new Error('Receiver ID, message, or sender ID missing');
+          }
+
+          // Send the message directly to the receiver
+          io.to(data.receiverId).emit('receive-message', {
+            message: data.message,
+            senderId: data.senderId,
+            timestamp: new Date().toISOString(),
+          });
+
+        } catch (err) {
+          console.error("Error sending message:", err);
+        }
+      });
+
+      // Event to leave a room (group chat)
       socket.on('leave-room', (roomId) => {
         socket.leave(roomId);
         console.log(`User left room: ${roomId}`);
       });
 
+      // Handle socket disconnection
       socket.on('disconnect', () => {
         console.log('A user disconnected');
       });
