@@ -1,9 +1,10 @@
 import express from 'express';
-import { createGroup, getGroupDetails, updateGroup, deleteGroup, joinGroup, leaveGroup, getGroupMembers } from '../controller/group.controller.js';
+import { createGroup, getGroup, getGroupDetails, updateGroup, deleteGroup, joinGroup, leaveGroup, getGroupMembers } from '../controller/group.controller.js';
 import {auth} from "../middleware/auth.js"
 const router = express.Router();
 
 router.post('/create',auth, createGroup);
+router.get("/view",auth,getGroup);
 router.get('/groups/:id',auth, getGroupDetails);
 router.put('/groups/:id',auth, updateGroup);
 router.delete('/groups/:id',auth, deleteGroup);

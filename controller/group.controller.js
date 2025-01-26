@@ -1,40 +1,42 @@
 import Group from '../model/group.model.js';
 import Community from '../model/community.model.js';
 
-// Create a new group
 export const createGroup = async (req, res) => {
-  const { name, description, members, communityId } = req.body;
-
-  // Check if user is authenticated (req.user is populated by the auth middleware)
-  if (!req.user) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-
-  const createdBy = req.user.id; // Get user ID from decoded token
-
-  // Check if community exists (if a communityId is provided)
-  if (communityId) {
-    const community = await Community.findById(communityId);
-    if (!community) {
-      return res.status(400).json({ message: "Community not found" });
-    }
-  }
-
-  // Check for duplicate group name
-  const existingGroup = await Group.findOne({ name });
-  if (existingGroup) {
-    return res.status(400).json({ message: "Group with that name already exists" });
-  }
-
   try {
-    const newGroup = new Group({ name, description, createdBy, members, communityId });
+    const { name, description, members, groupIcon} = req.body;
+
+    // Check if user is authenticated (req.user is populated by the auth middleware)
+    if (!req.user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const createdBy = req.user.id; // Get user ID from decoded token
+
+    // Check for duplicate group name
+    const existingGroup = await Group.findOne({ name });
+    if (existingGroup) {
+      return res.status(400).json({ message: "Group with that name already exists" });
+    }
+
+    // Create the new group
+    const newGroup = new Group({
+      name,
+      description,
+      created_by: createdBy,  // Set created_by to the authenticated user's ID
+      members,
+      groupIcon,  // Set groupIcon (URL or path to the icon)
+    });
+
+    // Save the group to the database
     await newGroup.save();
-    res.status(201).json(newGroup);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Internal Server Error" });
+
+    return res.status(201).json({ message: 'Group created successfully', newGroup });
+  } catch (error) {
+    console.error('Error creating group:', error);
+    return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
+
 
 // Get group details
 export const getGroupDetails = async (req, res) => {
@@ -165,5 +167,30 @@ export const getGroupMembers = async (req, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+
+export const getGroup = async (req, res) => {
+  try {
+    const userId = req.user._id;  // Get the authenticated user's ID from the request object
+
+    // Find the groups where the user is a member
+    const groups = await Group.find({ members: { $in: [userId] } })
+      .populate('created_by', 'username profile_picture')  // Populate the creator's details
+      .populate('members', 'username profile_picture')  // Populate member details
+      .populate('messages');  // Optionally populate messages (can be optimized later)
+
+    // If no groups are found
+    if (!groups || groups.length === 0) {
+      return res.status(404).json({ message: 'No groups found for this user.' });
+    }
+
+    // Return the groups
+    return res.status(200).json({ groups });
+    
+  } catch (error) {
+    console.error("Error fetching groups:", error);
+    return res.status(500).json({ message: 'Server error. Could not fetch groups.' });
   }
 };
