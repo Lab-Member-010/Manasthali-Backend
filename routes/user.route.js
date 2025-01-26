@@ -15,7 +15,8 @@ import {
   unfollowUser,
   verifyOtp,
   forgotPassword,
-  resetPassword,getAllUsersExceptOne
+  resetPassword,getAllUsersExceptOne,
+  getDMList
 } from "../controller/user.controller.js";
 import { body } from "express-validator";
 import { auth } from "../middleware/auth.js";
@@ -94,5 +95,8 @@ router.post("/unfollow", auth, unfollowUser);
 
 // get all users
 router.get("/get-all-users-except/:id",auth,getAllUsersExceptOne);
+
+//get dm list
+router.get("/dmlist/:id",auth, getDMList); 
 
 export default router;
