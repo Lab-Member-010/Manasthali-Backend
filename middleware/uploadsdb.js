@@ -1,21 +1,15 @@
-import multer from "multer";
-import path from "path";
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import multer from 'multer';
+import cloudinary from './cloudinary.config.js'; 
 
-// Configure multer storage for file uploads.
-const storage = multer.diskStorage({
-  destination: function (request, file, callback) {
-    callback(null, "./uploads");
-  },
-  filename: function (request, file, callback) {
-    console.log(file);
-    callback(
-      null,
-      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
-    );
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'uploads', 
+    allowed_formats: ['jpg', 'jpeg', 'png', 'gif'],
   },
 });
 
-// Export multer upload configuration.
-const upload = multer({ storage });
+const upload = multer({ storage: storage });
 
 export default upload;

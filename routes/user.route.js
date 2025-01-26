@@ -16,7 +16,9 @@ import {
   verifyOtp,
   forgotPassword,
   resetPassword,getAllUsersExceptOne,
-  getDMList
+  getDMList,
+  checkUsername,
+  checkEmail
 } from "../controller/user.controller.js";
 import { body } from "express-validator";
 import { auth } from "../middleware/auth.js";
@@ -98,5 +100,9 @@ router.get("/get-all-users-except/:id",auth,getAllUsersExceptOne);
 
 //get dm list
 router.get("/dmlist/:id",auth, getDMList); 
+
+router.post("/email",checkEmail);
+
+router.post("/username",checkUsername);
 
 export default router;

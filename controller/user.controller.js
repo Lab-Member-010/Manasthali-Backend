@@ -677,3 +677,41 @@ export const getDMList = async (req, res) => {
     res.status(500).json({ error: 'Internal Server error' });
   }
 };
+
+// Check if email exists
+export const checkEmail = async (req, res) => {
+  const { email } = req.body;
+  
+  try {
+    // Check if email is already in the database
+    const user = await User.findOne({ email });
+    
+    if (user) {
+      return res.status(400).json({ exists: true, message: "This email is already registered." });
+    }
+
+    return res.status(200).json({ exists: false });
+  } catch (error) {
+    console.error("Error checking email:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// Check if username exists
+export const checkUsername = async (req, res) => {
+  const { username } = req.body;
+  
+  try {
+    // Check if username is already in the database
+    const user = await User.findOne({ username });
+    
+    if (user) {
+      return res.status(400).json({ exists: true, message: "This username is already taken." });
+    }
+
+    return res.status(200).json({ exists: false });
+  } catch (error) {
+    console.error("Error checking username:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
