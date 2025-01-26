@@ -5,7 +5,6 @@ import jwt from "jsonwebtoken";
 import { myOPT, sendEmail } from "../mailer/mymail.js";
 import crypto from "crypto";
 import dotenv from "dotenv";
-
 dotenv.config();
 
 //sign-up
@@ -421,7 +420,8 @@ export const genderUpdate=async(req,res,next)=>{
 //delete user
 export const deleteUserById = async (req, res) => {
     try {
-        const deletedUser = await User.findOneAndDelete({ userId: req.params.id });
+      console.log(req.headers)
+        const deletedUser = await User.findOneAndDelete({ _id: req.params.id });
 
         if (!deletedUser) {
             return res.status(404).json({ error: "User not found" });
@@ -450,7 +450,7 @@ export const deleteUserById = async (req, res) => {
   }
 };
 
-// // Fetch following users with username and profile picture
+// Fetch following users with username and profile picture
 export const getUserFollowing = async (req, res) => {
   console.log("Token in request:", req.header("Authorization")); 
   try {
@@ -470,8 +470,7 @@ export const getUserFollowing = async (req, res) => {
   }
 };
 
-
-
+//
 export const followUser = async (req, res) => {
     try {
       const { userId, userIdToFollow } = req.body;
@@ -507,59 +506,6 @@ export const followUser = async (req, res) => {
       res.status(500).json({ message: "Server error" });
     }
   };
-  
-export const sendFollowRequest = async (req, res) => {
-    try {
-        const { senderId, receiverId } = req.body;
-        const receiver = await User.findById(receiverId);
-        if (!receiver || !senderId) {
-            return res.status(404).json({ message: "Invalid sender or receiver ID" });
-        }
-        console.log("Sender ID:", senderId);
-        console.log("Receiver ID:", receiverId);
-        console.log("Receiver Privacy:", receiver.privacy_settings.profile_visibility);
-        if (receiver.privacy_settings.profile_visibility === "public") {
-            receiver.followers.push(senderId);
-            const sender = await User.findById(senderId);
-            sender.following.push(receiverId);
-            await receiver.save();
-            await sender.save();
-            return res.status(200).json({ message: "Followed successfully!" });
-        } else {
-            receiver.follow_requests.push({ sender: senderId, status: "pending" });
-            await receiver.save();
-            return res.status(200).json({ message: "Follow request sent!" });
-        }
-    } catch (error) {
-        console.error("Error sending follow request:", error);
-        return res.status(500).json({ message: "Internal Server Error", error: error.message });
-    }
-};
-
-// Handle follow request
-export const handleFollowRequest = async (req, res) => {
-    const { receiverId, senderId, action } = req.body;
-    const receiver = await User.findById(receiverId);
-    if (!receiver) return res.status(404).json({ message: "User not found" });
-
-    const request = receiver.follow_requests.find(req => req.sender.toString() === senderId);
-    if (!request) return res.status(404).json({ message: "Follow request not found" });
-
-    if (action === "accept") {
-        request.status = "accepted";
-        receiver.followers.push(senderId);
-
-        const sender = await User.findById(senderId);
-        sender.following.push(receiverId);
-        await sender.save();
-    } else if (action === "reject") {
-        request.status = "rejected";
-    }
-
-    await receiver.save();
-    return res.status(200).json({ message: `Request ${action}ed!` });
-};
-
 
 // //unfollow user
 export const unfollowUser = async (req, res) => {
@@ -607,6 +553,7 @@ export const getAllUsersExceptOne = async (req, res) => {
     }
 };
 
+// update bio
 export const bioUpdateById= async (req,res)=>{
     try {
         const { id } = req.params; // Extract user ID from params
@@ -642,7 +589,7 @@ export const bioUpdateById= async (req,res)=>{
     }
 }
 
-
+//get dm list
 export const getDMList = async (req, res) => {
   const { id } = req.params; // Use `id` from the URL parameter
 
@@ -675,43 +622,5 @@ export const getDMList = async (req, res) => {
   } catch (error) {
     console.error('Error fetching DM list:', error);
     res.status(500).json({ error: 'Internal Server error' });
-  }
-};
-
-// Check if email exists
-export const checkEmail = async (req, res) => {
-  const { email } = req.body;
-  
-  try {
-    // Check if email is already in the database
-    const user = await User.findOne({ email });
-    
-    if (user) {
-      return res.status(400).json({ exists: true, message: "This email is already registered." });
-    }
-
-    return res.status(200).json({ exists: false });
-  } catch (error) {
-    console.error("Error checking email:", error);
-    return res.status(500).json({ error: "Internal server error" });
-  }
-};
-
-// Check if username exists
-export const checkUsername = async (req, res) => {
-  const { username } = req.body;
-  
-  try {
-    // Check if username is already in the database
-    const user = await User.findOne({ username });
-    
-    if (user) {
-      return res.status(400).json({ exists: true, message: "This username is already taken." });
-    }
-
-    return res.status(200).json({ exists: false });
-  } catch (error) {
-    console.error("Error checking username:", error);
-    return res.status(500).json({ error: "Internal server error" });
   }
 };
