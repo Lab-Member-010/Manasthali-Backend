@@ -5,7 +5,6 @@ import jwt from "jsonwebtoken";
 import { myOPT, sendEmail } from "../mailer/mymail.js";
 import crypto from "crypto";
 import dotenv from "dotenv";
-import { log } from "console";
 
 dotenv.config();
 
@@ -683,3 +682,39 @@ export const bioUpdateById= async (req,res)=>{
         return res.status(500).json({ error: "Internal server error" });
     }
 }
+
+
+export const getDMList = async (req, res) => {
+  const { id } = req.params; // Use `id` from the URL parameter
+
+  try {
+    // Fetch the user object
+    const user = await User.findById(id)
+      .populate('followers following', 'username profile_picture'); // Populate followers and following with basic user info
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Get the list of followers (users who follow the current user)
+    const followers = user.followers;
+
+    // Get the list of following (users the current user is following)
+    const following = user.following;
+
+    // Combine followers and following lists, removing duplicates (users who are both following and followers)
+    const combinedList = [
+      ...followers,
+      ...following.filter(followedUser => !followers.some(f => f._id.toString() === followedUser._id.toString())),
+    ];
+
+    // Remove the current user from the list if they appear
+    const dmList = combinedList.filter(user => user._id.toString() !== id);
+
+    // Send the DM list to the client
+    res.json(dmList);
+  } catch (error) {
+    console.error('Error fetching DM list:', error);
+    res.status(500).json({ error: 'Internal Server error' });
+  }
+};

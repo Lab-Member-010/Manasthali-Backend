@@ -24,6 +24,7 @@ export const sendMessage = async (req, res) => {
   }
 };
 
+
 export const getMessages = async (req, res) => {
   try {
     const { receiverId } = req.params;

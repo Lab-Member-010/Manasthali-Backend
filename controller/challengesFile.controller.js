@@ -3,7 +3,7 @@ import {ChallengesFile} from "../model/challengesFile.model.js";  // Make sure t
 
 export const getDailyChallenge = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userId = req.params.userId;
     console.log("User ID from token:", userId); // Debugging userId from token
 
     // Fetch user and select only personality_type field
