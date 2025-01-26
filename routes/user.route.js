@@ -74,9 +74,6 @@ router.put("/:id/contact",auth,contactUpdateById)
 // Update user DOB
 router.put("/:id/dob",auth,DobUpdateById);
 
-// update user bio
-router.put("/:id/bio",auth,bioUpdateById);
-
 // Update user gender
 router.put("/:id/gender",auth,genderUpdate);
 
