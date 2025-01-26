@@ -1,9 +1,9 @@
-import Group from '../model/group.model.js';
+import GroupMessage, { Group } from '../model/group.model.js';
 import Community from '../model/community.model.js';
 
 export const createGroup = async (req, res) => {
   try {
-    const { name, description, members, groupIcon} = req.body;
+    const { name, description, members, groupIcon, communityId, message } = req.body;
 
     // Check if user is authenticated (req.user is populated by the auth middleware)
     if (!req.user) {
@@ -25,10 +25,23 @@ export const createGroup = async (req, res) => {
       created_by: createdBy,  // Set created_by to the authenticated user's ID
       members,
       groupIcon,  // Set groupIcon (URL or path to the icon)
+      communityId, // Add the communityId if provided
     });
 
     // Save the group to the database
     await newGroup.save();
+
+    // Now create the first message in the group (if a message is provided)
+    if (message) {
+      const newMessage = new GroupMessage({
+        message,
+        group: newGroup._id, // Link the message to the newly created group
+        sender: createdBy, // Set the sender as the user who created the group
+      });
+
+      // Save the group message
+      await newMessage.save();
+    }
 
     return res.status(201).json({ message: 'Group created successfully', newGroup });
   } catch (error) {
@@ -192,5 +205,21 @@ export const getGroup = async (req, res) => {
   } catch (error) {
     console.error("Error fetching groups:", error);
     return res.status(500).json({ message: 'Server error. Could not fetch groups.' });
+  }
+};
+
+export const getJoinedGroups = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    // Find groups that the user is a member of
+    const joinedGroups = await Group.find({ members: req.user.id });
+
+    return res.status(200).json(joinedGroups);
+  } catch (error) {
+    console.error('Error fetching joined groups:', error);
+    return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
