@@ -3,7 +3,7 @@ import Community from '../model/community.model.js';
 
 export const createGroup = async (req, res) => {
   try {
-    const { name, description, members, groupIcon} = req.body;
+    const { name, description, members, groupIcon, communityId } = req.body;
 
     // Check if user is authenticated (req.user is populated by the auth middleware)
     if (!req.user) {
@@ -25,6 +25,7 @@ export const createGroup = async (req, res) => {
       created_by: createdBy,  // Set created_by to the authenticated user's ID
       members,
       groupIcon,  // Set groupIcon (URL or path to the icon)
+      communityId, // Add the communityId if provided
     });
 
     // Save the group to the database
