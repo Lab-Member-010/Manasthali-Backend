@@ -136,6 +136,8 @@ export const unlikePost = async (request, response, next) => {
     return response.status(500).json({ error: "internal server error" })
   }
 };
+ // Like a post
+ 
 
 export const addComment = async (req, res) => {
   try {
