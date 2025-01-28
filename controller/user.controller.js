@@ -7,48 +7,66 @@ import crypto from "crypto";
 import dotenv from "dotenv";
 dotenv.config();
 
-//sign-up
+
 export const SignUp = async (request, response, next) => {
-    try {
-        const errors = validationResult(request);
-        if (!errors.isEmpty()) {
-            console.error("Validation errors:", errors.array());
-            return response.status(400).json({ error: "Bad request", details: errors.array() });
-        }
+  try {
+      // Validate request data
+      const errors = validationResult(request);
+      if (!errors.isEmpty()) {
+          console.error("Validation errors:", errors.array());
+          return response.status(400).json({ error: "Bad request", details: errors.array() });
+      }
 
-        const { email, password, username, contact, dob, gender } = request.body;
+      // Destructure user data from request body
+      const { email, password, username, contact, dob, gender } = request.body;
 
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            console.error(`Email already exists: ${email}`);
-            return response.status(409).json({ error: "Email already exists" });
-        }
-        // Generate OTP
-        const otp = myOPT(email);
-        // Encrypt password
-        const saltKey = bcrypt.genSaltSync(10);
-        const encryptedPassword = bcrypt.hashSync(password, saltKey);
-        // Create a new user with verified set to false
-        const user = new User({
-            email,
-            username,
-            contact,
-            dob,
-            gender,
-            password: encryptedPassword,
-            otp,
-            verified: false,
-        });
-        await user.save();
-        return response.status(201).json({
-            message: "Sign up success. OTP sent to your email.",
-            user: { id: user.id, email: user.email, username: user.username }, // Send only safe data
-        });
-    } catch (err) {
-        console.error("Unexpected error during SignUp process:", err);
-        return response.status(500).json({ error: "Internal Server Error" });
-    }
+      // Check if the email already exists in the database
+      const existingUserByEmail = await User.findOne({ email });
+      if (existingUserByEmail) {
+          console.error(`Email already exists: ${email}`);
+          return response.status(409).json({ error: "Email already exists" });
+      }
+
+      // Check if the username already exists in the database
+      const existingUserByUsername = await User.findOne({ username });
+      if (existingUserByUsername) {
+          console.error(`Username already exists: ${username}`);
+          return response.status(409).json({ error: "Username already taken" });
+      }
+
+      // Generate OTP
+      const otp = myOPT(email);
+
+      // Encrypt password
+      const saltKey = bcrypt.genSaltSync(10);
+      const encryptedPassword = bcrypt.hashSync(password, saltKey);
+
+      // Create a new user with the verified status set to false
+      const user = new User({
+          email,
+          username,
+          contact,
+          dob,
+          gender,
+          password: encryptedPassword,
+          otp,
+          verified: false,
+      });
+
+      // Save the new user to the database
+      await user.save();
+
+      return response.status(201).json({
+          message: "Sign up successful. OTP sent to your email.",
+          user: { id: user.id, email: user.email, username: user.username }, // Send only safe data
+      });
+
+  } catch (err) {
+      console.error("Unexpected error during SignUp process:", err);
+      return response.status(500).json({ error: "Internal Server Error" });
+  }
 };
+
 
 // Verify OTP
 export const verifyOtp = async (req, res) => {
@@ -622,5 +640,35 @@ export const getDMList = async (req, res) => {
   } catch (error) {
     console.error('Error fetching DM list:', error);
     res.status(500).json({ error: 'Internal Server error' });
+  }
+};
+
+export const checkEmail = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (user) {
+      return res.status(409).json({ available: false, message: "Email already exists." });
+    }
+    return res.status(200).json({ available: true });
+  } catch (error) {
+    console.error("Error checking email:", error);
+    return res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+export const checkUsername = async (req, res) => {
+  const { username } = req.body;
+
+  try {
+    const user = await User.findOne({ username });
+    if (user) {
+      return res.status(409).json({ available: false, message: "Username already exists." });
+    }
+    return res.status(200).json({ available: true });
+  } catch (error) {
+    console.error("Error checking username:", error);
+    return res.status(500).json({ error: "Internal server error." });
   }
 };
