@@ -12,8 +12,8 @@ router.put('/posts/:id',auth, updatePost);
 router.delete('/posts/:id',auth, deletePost);
 router.post('/posts/:id/like',auth, likePost);
 router.post('/posts/:id/unlike',auth, unlikePost);
-router.post('/post/:id/addcomment',auth,addComment)
-router.get('/post/:id/comments',auth, getPostComments);
+router.post('/posts/:id/addcomment',auth,addComment);
+router.get('/posts/:id/comments',auth, getPostComments);
 router.post('/posts/:id/share', auth,sharePost);
 router.get('/all-posts/:id',auth,getAllPosts);
 
