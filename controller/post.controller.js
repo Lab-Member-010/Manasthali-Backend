@@ -102,22 +102,23 @@ export const likePost = async (request, response) => {
   }
 };
 
-// Unlike Post Controller
+ 
 export const unlikePost = async (request, response) => {
   try {
     const { id } = request.params;
     const { userId } = request.body;
     const post = await Post.findById(id);
+    
     if (!post) {
       return response.status(404).json({ error: "Post not found" });
     }
-    // Check if the user has liked the post
+
     if (!post.likes.includes(userId)) {
       return response.status(400).json({ message: "You haven't liked this post" });
     }
-
     post.likes = post.likes.filter(likeId => !likeId.equals(userId));
     await post.save();
+
     return response.status(200).json({ message: "Post unliked", likeCount: post.likes.length });
   } catch (error) {
     console.error(error);
@@ -163,17 +164,51 @@ export const addComment = async (req, res) => {
 
   
 // Get comments on a post
+// export const getPostComments = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+
+//     // Post को पॉप्युलेट करें
+//     const post = await Post.findById(id).populate({
+//       path: "comments", // Post के comments को पॉप्युलेट करें
+//       select: "comment user_id", // comment और user_id को पॉप्युलेट करें
+//       populate: {
+//         path: "user_id", // Comment के user_id को पॉप्युलेट करें
+//         select: "name email", // केवल नाम और ईमेल को पॉप्युलेट करें
+//       },
+//     });
+
+//     if (!post) {
+//       return res.status(404).json({ message: "Post not found" });
+//     }
+
+//     // comments में "comment" फील्ड शामिल है
+//     const comments = post.comments.map(comment => ({
+//       ...comment.toObject(),
+//       comment: comment.comment // comment टेक्स्ट को निकालें
+//     }));
+
+//     return res.status(200).json({
+//       message: "Comments fetched successfully",
+//       comments, // Comments के साथ comment टेक्स्ट भी होगा
+//     });
+
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(500).json({ error: "Internal server error" });
+//   }
+// };
 export const getPostComments = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    // Post को पॉप्युलेट करें
+    // Populating the comments and user details
     const post = await Post.findById(id).populate({
-      path: "comments", // Post के comments को पॉप्युलेट करें
-      select: "comment user_id", // comment और user_id को पॉप्युलेट करें
+      path: "comments",
+      select: "comment user_id",
       populate: {
-        path: "user_id", // Comment के user_id को पॉप्युलेट करें
-        select: "name email", // केवल नाम और ईमेल को पॉप्युलेट करें
+        path: "user_id",
+        select: "name username profile_picture", // Add username and profile_picture here
       },
     });
 
@@ -181,15 +216,13 @@ export const getPostComments = async (req, res, next) => {
       return res.status(404).json({ message: "Post not found" });
     }
 
-    // comments में "comment" फील्ड शामिल है
     const comments = post.comments.map(comment => ({
       ...comment.toObject(),
-      comment: comment.comment // comment टेक्स्ट को निकालें
+      comment: comment.comment // comment text
     }));
-
     return res.status(200).json({
       message: "Comments fetched successfully",
-      comments, // Comments के साथ comment टेक्स्ट भी होगा
+      comments, // Return comments with full details
     });
 
   } catch (error) {
