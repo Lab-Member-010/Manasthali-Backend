@@ -5,7 +5,6 @@ import jwt from "jsonwebtoken";
 import { myOPT, sendEmail } from "../mailer/mymail.js";
 import crypto from "crypto";
 import dotenv from "dotenv";
-
 dotenv.config();
 
 
@@ -234,8 +233,8 @@ export const forgotPassword = async (req, res) => {
 // Reset Password
 export const resetPassword = async (req, res) => {
     try {
-        const { token, newPassword } = req.body;
-        console.log(token + newPassword);
+        const { token, password } = req.body;
+        console.log(token + password);
         const user = await User.findOne({
             resetToken: token,
             resetTokenExpiry: { $gt: Date.now() }, // Ensure token is still valid
@@ -247,7 +246,7 @@ export const resetPassword = async (req, res) => {
 
         // Encrypt the new password
         const saltKey = bcrypt.genSaltSync(10);
-        const encryptedPassword = bcrypt.hashSync(newPassword, saltKey);
+        const encryptedPassword = bcrypt.hashSync(password, saltKey);
 
         // Update user's password and clear the reset token and expiry
         user.password = encryptedPassword;
@@ -439,7 +438,8 @@ export const genderUpdate=async(req,res,next)=>{
 //delete user
 export const deleteUserById = async (req, res) => {
     try {
-        const deletedUser = await User.findOneAndDelete({ userId: req.params.id });
+      console.log(req.headers)
+        const deletedUser = await User.findOneAndDelete({ _id: req.params.id });
 
         if (!deletedUser) {
             return res.status(404).json({ error: "User not found" });
@@ -468,7 +468,7 @@ export const deleteUserById = async (req, res) => {
   }
 };
 
-// // Fetch following users with username and profile picture
+// Fetch following users with username and profile picture
 export const getUserFollowing = async (req, res) => {
   console.log("Token in request:", req.header("Authorization")); 
   try {
@@ -488,8 +488,7 @@ export const getUserFollowing = async (req, res) => {
   }
 };
 
-
-
+//
 export const followUser = async (req, res) => {
     try {
       const { userId, userIdToFollow } = req.body;
@@ -525,59 +524,6 @@ export const followUser = async (req, res) => {
       res.status(500).json({ message: "Server error" });
     }
   };
-  
-export const sendFollowRequest = async (req, res) => {
-    try {
-        const { senderId, receiverId } = req.body;
-        const receiver = await User.findById(receiverId);
-        if (!receiver || !senderId) {
-            return res.status(404).json({ message: "Invalid sender or receiver ID" });
-        }
-        console.log("Sender ID:", senderId);
-        console.log("Receiver ID:", receiverId);
-        console.log("Receiver Privacy:", receiver.privacy_settings.profile_visibility);
-        if (receiver.privacy_settings.profile_visibility === "public") {
-            receiver.followers.push(senderId);
-            const sender = await User.findById(senderId);
-            sender.following.push(receiverId);
-            await receiver.save();
-            await sender.save();
-            return res.status(200).json({ message: "Followed successfully!" });
-        } else {
-            receiver.follow_requests.push({ sender: senderId, status: "pending" });
-            await receiver.save();
-            return res.status(200).json({ message: "Follow request sent!" });
-        }
-    } catch (error) {
-        console.error("Error sending follow request:", error);
-        return res.status(500).json({ message: "Internal Server Error", error: error.message });
-    }
-};
-
-// Handle follow request
-export const handleFollowRequest = async (req, res) => {
-    const { receiverId, senderId, action } = req.body;
-    const receiver = await User.findById(receiverId);
-    if (!receiver) return res.status(404).json({ message: "User not found" });
-
-    const request = receiver.follow_requests.find(req => req.sender.toString() === senderId);
-    if (!request) return res.status(404).json({ message: "Follow request not found" });
-
-    if (action === "accept") {
-        request.status = "accepted";
-        receiver.followers.push(senderId);
-
-        const sender = await User.findById(senderId);
-        sender.following.push(receiverId);
-        await sender.save();
-    } else if (action === "reject") {
-        request.status = "rejected";
-    }
-
-    await receiver.save();
-    return res.status(200).json({ message: `Request ${action}ed!` });
-};
-
 
 // //unfollow user
 export const unfollowUser = async (req, res) => {
@@ -642,6 +588,7 @@ export const getAllUsersExceptOne = async (req, res) => {
     }
 };
 
+// update bio
 export const bioUpdateById= async (req,res)=>{
     try {
         const { id } = req.params; // Extract user ID from params
@@ -677,7 +624,7 @@ export const bioUpdateById= async (req,res)=>{
     }
 }
 
-
+//get dm list
 export const getDMList = async (req, res) => {
   const { id } = req.params; // Use `id` from the URL parameter
 

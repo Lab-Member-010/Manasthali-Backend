@@ -16,9 +16,7 @@ import {
   verifyOtp,
   forgotPassword,
   resetPassword,getAllUsersExceptOne,
-  getDMList,
-  checkUsername,
-  checkEmail
+  getDMList
 } from "../controller/user.controller.js";
 import { body } from "express-validator";
 import { auth } from "../middleware/auth.js";
@@ -78,7 +76,7 @@ router.put("/:id/dob",auth,DobUpdateById);
 router.put("/:id/gender",auth,genderUpdate);
 
 // Delete a user account
-router.delete("/:id", auth, deleteUserById);
+router.delete("/:id/delete", auth, deleteUserById);
 
 // Get followers of a user
 router.get("/:id/followers", auth, getUserFollowers);
@@ -98,8 +96,7 @@ router.get("/get-all-users-except/:id",auth,getAllUsersExceptOne);
 //get dm list
 router.get("/dmlist/:id",auth, getDMList); 
 
-router.post("/email",checkEmail);
-
-router.post("/username",checkUsername);
+//update user bio
+router.put("/:id/bio",auth,bioUpdateById);
 
 export default router;
