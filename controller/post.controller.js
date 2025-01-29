@@ -4,11 +4,9 @@ import Comment from '../model/comment.model.js'
 //Create a new post
 export const createPost = async (request, response, next) => {
   try {
-    let { userId } = request.body;
-    console.log(request.files);
+    let { userId,description } = request.body;
     const media = request.files.map((file) => file.path);
-    console.log(media)
-    let newpost = new Post({ userId, media });
+    let newpost = new Post({ userId,description, media });
     let savepost = await newpost.save();
     return response.status(201).json({ message: "post created successfully", savepost });
   } catch (error) {
@@ -16,8 +14,6 @@ export const createPost = async (request, response, next) => {
     return response.status(500).json({ error: "Inatenal srver error" });
   }
 }
-
-
 
 // Get post details
 export const getPostDetails = async (request, response, next) => {
