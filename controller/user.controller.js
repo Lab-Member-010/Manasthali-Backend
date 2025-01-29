@@ -581,25 +581,42 @@ export const handleFollowRequest = async (req, res) => {
 
 // //unfollow user
 export const unfollowUser = async (req, res) => {
-    try {
-        const currentUser = await User.findById(req.user.payload);
-        const targetUser = await User.findById(req.params.id);
-        if (!currentUser || !targetUser) {
-            return res.status(404).json({ error: "User not found" });
-        }
-        currentUser.following = currentUser.following.filter(
-            (id) => id.toString() !== targetUser._id.toString()
-        );
-        await currentUser.save();
-        targetUser.followers = targetUser.followers.filter(
-            (id) => id.toString() !== currentUser._id.toString()
-        );
-        await targetUser.save();
-        return res.status(200).json({ message: "User unfollowed successfully" });
-    } catch (err) {
-        console.error(err);
-        return res.status(500).json({ error: "Internal Server Error" });
-    }
+  try {
+      const { userId, userIdToUnfollow } = req.body;  // Extract IDs correctly
+
+      if (!userId || !userIdToUnfollow) {
+          return res.status(400).json({ error: "Invalid request. Missing user ID." });
+      }
+
+      if (userId === userIdToUnfollow) {
+          return res.status(400).json({ error: "You cannot unfollow yourself." });
+      }
+
+      const currentUser = await User.findById(userId);
+      const targetUser = await User.findById(userIdToUnfollow);
+
+      if (!currentUser || !targetUser) {
+          return res.status(404).json({ error: "User not found" });
+      }
+
+      // Remove from following list
+      currentUser.following = currentUser.following.filter(
+          (id) => id.toString() !== userIdToUnfollow
+      );
+      await currentUser.save();
+
+      // Remove from followers list
+      targetUser.followers = targetUser.followers.filter(
+          (id) => id.toString() !== userId
+      );
+      await targetUser.save();
+
+      return res.status(200).json({ message: "Unfollowed successfully" });
+
+  } catch (err) {
+      console.error("Error unfollowing user:", err);
+      return res.status(500).json({ error: "Internal Server Error" });
+  }
 };
 
 // Get all users except you
