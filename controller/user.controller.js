@@ -233,8 +233,8 @@ export const forgotPassword = async (req, res) => {
 // Reset Password
 export const resetPassword = async (req, res) => {
     try {
-        const { token, newPassword } = req.body;
-        console.log(token + newPassword);
+        const { token, password } = req.body;
+        console.log(token + password);
         const user = await User.findOne({
             resetToken: token,
             resetTokenExpiry: { $gt: Date.now() }, // Ensure token is still valid
@@ -246,7 +246,7 @@ export const resetPassword = async (req, res) => {
 
         // Encrypt the new password
         const saltKey = bcrypt.genSaltSync(10);
-        const encryptedPassword = bcrypt.hashSync(newPassword, saltKey);
+        const encryptedPassword = bcrypt.hashSync(password, saltKey);
 
         // Update user's password and clear the reset token and expiry
         user.password = encryptedPassword;
