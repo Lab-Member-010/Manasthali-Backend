@@ -7,11 +7,12 @@ import { User } from "../model/user.model.js";
 export const addComment = async (request, response, next) => {
   // Logic to add a new comment
   try {
-    const { post_id, user_id, comment, parent_comment_id } = request.body;
-
+    const { userId, comment, parent_comment_id } = request.body;
+    const post_id=request.params.postId;
+    console.log(comment)
     const newComment = new Comment({
       post_id,
-      user_id,
+      userId,
       comment,
       parent_comment_id: parent_comment_id || null,
     });

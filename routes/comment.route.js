@@ -3,7 +3,7 @@ import  {auth} from "../middleware/auth.js"
 import { addComment, getCommentDetails, updateComment, deleteComment, likeComment } from '../controller/comment.controller.js';
 const router = express.Router();
 
-router.post('/comments',auth, addComment);
+router.post('/addComment/:postId',auth, addComment);
 router.get('/comments/:id',auth, getCommentDetails);
 router.put('/comments/:id',auth, updateComment);
 router.delete('/comments/:id',auth, deleteComment);

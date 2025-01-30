@@ -122,59 +122,6 @@ export const unlikePost = async (request, response) => {
   }
 };
 
-  
-export const addComment = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { text } = req.body;
-
-    // Check if the user is authenticated
-    if (!req.user || !req.user._id) {
-      return res.status(401).json({ message: "User not authenticated" });
-    }
-
-    const user_id = req.user._id;
-
-    // Fetch the user details
-    const user = await User.findById(user_id); // Fetch user details using user_id
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    const post = await Post.findById(id);
-    if (!post) {
-      return res.status(404).json({ message: "Post not found" });
-    }
-
-    // Create a new comment with the user's details
-    const newComment = new Comment({
-      post_id: id,      // Correct reference to post_id
-      user_id,          // Correct user_id
-      text,
-      username: user.username,           // Add username from user data
-      profile_picture: user.profile_picture, // Add profile picture from user data
-    });
-
-    // Save the comment
-    await newComment.save();
-
-    // Add the comment to the post's comments array
-    post.comments.push(newComment._id);
-    post.comment_count += 1;
-    await post.save();
-
-    return res.status(201).json({
-      message: "Comment added successfully",
-      comment: newComment,
-    });
-  } catch (error) {
-    console.error("Error adding comment:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
-  }
-};
-
-
 export const getPostComments = async (req, res, next) => {
   try {
     const postId = req.params.id;
