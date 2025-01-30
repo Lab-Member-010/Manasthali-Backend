@@ -1,6 +1,6 @@
 import Post from '../model/post.model.js';
 import Comment from '../model/comment.model.js'
-
+import { User } from "../model/user.model.js"; 
 //Create a new post
 export const createPost = async (request, response, next) => {
   try {
@@ -122,32 +122,48 @@ export const unlikePost = async (request, response) => {
   }
 };
 
- 
+  
 export const addComment = async (req, res) => {
   try {
     const { id } = req.params;
     const { text } = req.body;
+
+    // Check if the user is authenticated
     if (!req.user || !req.user._id) {
       return res.status(401).json({ message: "User not authenticated" });
     }
 
     const user_id = req.user._id;
+
+    // Fetch the user details
+    const user = await User.findById(user_id); // Fetch user details using user_id
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     const post = await Post.findById(id);
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
     }
-    // Create a new comment
+
+    // Create a new comment with the user's details
     const newComment = new Comment({
-      post_id: id, // Correct reference to post_id
-      user_id,     // Correct user_id
+      post_id: id,      // Correct reference to post_id
+      user_id,          // Correct user_id
       text,
+      username: user.username,           // Add username from user data
+      profile_picture: user.profile_picture, // Add profile picture from user data
     });
+
     // Save the comment
     await newComment.save();
+
     // Add the comment to the post's comments array
     post.comments.push(newComment._id);
     post.comment_count += 1;
     await post.save();
+
     return res.status(201).json({
       message: "Comment added successfully",
       comment: newComment,
@@ -158,72 +174,20 @@ export const addComment = async (req, res) => {
   }
 };
 
-  
-// Get comments on a post
-// export const getPostComments = async (req, res, next) => {
-//   try {
-//     const { id } = req.params;
 
-//     // Post को पॉप्युलेट करें
-//     const post = await Post.findById(id).populate({
-//       path: "comments", // Post के comments को पॉप्युलेट करें
-//       select: "comment user_id", // comment और user_id को पॉप्युलेट करें
-//       populate: {
-//         path: "user_id", // Comment के user_id को पॉप्युलेट करें
-//         select: "name email", // केवल नाम और ईमेल को पॉप्युलेट करें
-//       },
-//     });
-
-//     if (!post) {
-//       return res.status(404).json({ message: "Post not found" });
-//     }
-
-//     // comments में "comment" फील्ड शामिल है
-//     const comments = post.comments.map(comment => ({
-//       ...comment.toObject(),
-//       comment: comment.comment // comment टेक्स्ट को निकालें
-//     }));
-
-//     return res.status(200).json({
-//       message: "Comments fetched successfully",
-//       comments, // Comments के साथ comment टेक्स्ट भी होगा
-//     });
-
-//   } catch (error) {
-//     console.log(error);
-//     return res.status(500).json({ error: "Internal server error" });
-//   }
-// };
 export const getPostComments = async (req, res, next) => {
   try {
-    const { id } = req.params;
-
-    // Populating the comments and user details
-    const post = await Post.findById(id).populate({
-      path: "comments",
-      select: "comment user_id",
-      populate: {
-        path: "user_id",
-        select: "name username profile_picture", // Add username and profile_picture here
-      },
-    });
+    const postId = req.params.id;
+    const post = await Post.findById(postId).populate('comments'); // Ensure the comments are populated
 
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
     }
 
-    const comments = post.comments.map(comment => ({
-      ...comment.toObject(),
-      comment: comment.comment // comment text
-    }));
-    return res.status(200).json({
-      message: "Comments fetched successfully",
-      comments, // Return comments with full details
-    });
-
+    return res.status(200).json({ post });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ error: "Internal server error" });
+    console.error("Error fetching post with comments:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
