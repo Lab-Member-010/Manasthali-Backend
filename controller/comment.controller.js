@@ -9,7 +9,6 @@ export const addComment = async (request, response, next) => {
   try {
     const { userId, comment, parent_comment_id } = request.body;
     const post_id=request.params.postId;
-    console.log(comment)
     const newComment = new Comment({
       post_id,
       userId,

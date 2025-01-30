@@ -183,7 +183,7 @@ export const getAllPosts = async (req, res) => {
         .populate({
           path: 'comments',
           populate: {
-            path: 'user_id',
+            path: 'userId',
             select: 'username profilePicture',
           }
         })
