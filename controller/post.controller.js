@@ -17,17 +17,13 @@ export const createPost = async (request, response, next) => {
 
 // Get post details
 export const getPostDetails = async (request, response, next) => {
-  // Logic to fetch post details by ID
   try {
     let { id } = request.params;
-    let postbyId = await Post.findOne({ _id: id });
-    if (!postbyId) {
+    let post = await Post.findOne({ _id: id });
+    if (!post) {
       return response.status(404).json({ error: "post not found" });
     }
-    return response.status(201).json({ message: "post daetail successfully", postbyId });
-
-
-
+    return response.status(201).json({ message: "post detail successfully fetched", post});
   }
   catch (error) {
     return response.status(500).json({ error: "internal server error" });
