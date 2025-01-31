@@ -7,7 +7,7 @@ import crypto from "crypto";
 import dotenv from "dotenv";
 dotenv.config();
 
-
+// Sign-up
 export const SignUp = async (request, response, next) => {
   try {
       // Validate request data
@@ -41,7 +41,6 @@ export const SignUp = async (request, response, next) => {
       const saltKey = bcrypt.genSaltSync(10);
       const encryptedPassword = bcrypt.hashSync(password, saltKey);
 
-      // Create a new user with the verified status set to false
       const user = new User({
           email,
           username,
@@ -53,12 +52,11 @@ export const SignUp = async (request, response, next) => {
           verified: false,
       });
 
-      // Save the new user to the database
       await user.save();
 
       return response.status(201).json({
           message: "Sign up successful. OTP sent to your email.",
-          user: { id: user.id, email: user.email, username: user.username }, // Send only safe data
+          user: { id: user.id, email: user.email, username: user.username }, 
       });
 
   } catch (err) {
@@ -66,7 +64,6 @@ export const SignUp = async (request, response, next) => {
       return response.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 
 // Verify OTP
 export const verifyOtp = async (req, res) => {
@@ -97,13 +94,10 @@ export const forgotPassword = async (req, res) => {
             return res.status(404).json({ error: "User not found" });
         }
 
-        // Generate a reset token and set its expiry time
         const token = crypto.randomBytes(32).toString("hex");
         user.resetToken = token;
-        user.resetTokenExpiry = Date.now() + 3600000; // Token valid for 1 hour
+        user.resetTokenExpiry = Date.now() + 3600000; 
         await user.save();
-        console.log(token);
-        // Construct the reset link
         const resetLink = `http://localhost:3000/reset-password?token=${token}`;
 
         // Send reset instructions to the user's email
@@ -234,21 +228,18 @@ export const forgotPassword = async (req, res) => {
 export const resetPassword = async (req, res) => {
     try {
         const { token, password } = req.body;
-        console.log(token + password);
         const user = await User.findOne({
             resetToken: token,
-            resetTokenExpiry: { $gt: Date.now() }, // Ensure token is still valid
+            resetTokenExpiry: { $gt: Date.now() },
         });
 
         if (!user) {
             return res.status(400).json({ error: "Invalid or expired reset token" });
         }
 
-        // Encrypt the new password
         const saltKey = bcrypt.genSaltSync(10);
         const encryptedPassword = bcrypt.hashSync(password, saltKey);
 
-        // Update user's password and clear the reset token and expiry
         user.password = encryptedPassword;
         user.resetToken = null;
         user.resetTokenExpiry = null;
@@ -261,12 +252,11 @@ export const resetPassword = async (req, res) => {
     }
 };
 
-//sign-in
+// Sign-in
 export const SignIn = async (request, response, next) => {
     try {
         const { email, password } = request.body;
         const user = await User.findOne({ email });
-        console.log(user)
         if (user) {
             if (!user.verified) {
                 return response.status(401).json({ error: "Please verify your account before logging in." });
@@ -301,9 +291,7 @@ const generateToken = (userId) => {
 // get user details
 export const getUserById = async (req, res) => {
     try {
-        console.log(req.params)
         const user = await User.findById(req.params.id);
-        console.log(user)
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
@@ -318,8 +306,6 @@ export const getUserById = async (req, res) => {
 // update user details
 export const updateUserById = async (req, res) => {
     try {
-        console.log(req.files);
-        console.log(req.params.id);
         const { id } = req.params;
         const profile_picture = req.file ? req.file.path : null;
         const updateData = {
@@ -345,6 +331,7 @@ export const updateUserById = async (req, res) => {
      
 };
 
+// contact update
 export const contactUpdateById=async(req,res,next)=>{
     try {
         const { id } = req.params;
@@ -373,8 +360,9 @@ export const contactUpdateById=async(req,res,next)=>{
         console.error(error);
         res.status(500).json({ error: "Internal server error" });
       }
-}
+};
 
+// dob update
 export const DobUpdateById=async(req,res,next)=>{
     try {
         const { id } = req.params;
@@ -403,8 +391,9 @@ export const DobUpdateById=async(req,res,next)=>{
         console.error(error);
         res.status(500).json({ error: "Internal server error" });
       }
-}
+};
 
+// gender update
 export const genderUpdate=async(req,res,next)=>{
     try {
         const { id } = req.params;
@@ -435,10 +424,9 @@ export const genderUpdate=async(req,res,next)=>{
       }
 }
 
-//delete user
+// delete user
 export const deleteUserById = async (req, res) => {
     try {
-      console.log(req.headers)
         const deletedUser = await User.findOneAndDelete({ _id: req.params.id });
 
         if (!deletedUser) {
@@ -453,7 +441,6 @@ export const deleteUserById = async (req, res) => {
 };
 
  export const getUserFollowers = async (req, res) => {
-  console.log("Token in request:", req.header("Authorization")); // Debugging log
   try {
     const user = await User.findById(req.params.id).populate("followers", "username profile_picture");
 
@@ -470,7 +457,6 @@ export const deleteUserById = async (req, res) => {
 
 // Fetch following users with username and profile picture
 export const getUserFollowing = async (req, res) => {
-  console.log("Token in request:", req.header("Authorization")); 
   try {
     const user = await User.findById(req.params.id).populate(
       "following",
@@ -488,12 +474,10 @@ export const getUserFollowing = async (req, res) => {
   }
 };
 
-//
+// folllow user
 export const followUser = async (req, res) => {
     try {
       const { userId, userIdToFollow } = req.body;
-      console.log(userId);
-      console.log(userIdToFollow);
   
       if (userId === userIdToFollow) {
         return res.status(400).json({ message: "You cannot follow yourself" });
@@ -523,9 +507,9 @@ export const followUser = async (req, res) => {
       console.error(error);
       res.status(500).json({ message: "Server error" });
     }
-  };
+};
 
-// //unfollow user
+// unfollow user
 export const unfollowUser = async (req, res) => {
   try {
       const { userId, userIdToUnfollow } = req.body;  // Extract IDs correctly
@@ -626,12 +610,11 @@ export const bioUpdateById= async (req,res)=>{
 
 //get dm list
 export const getDMList = async (req, res) => {
-  const { id } = req.params; // Use `id` from the URL parameter
+  const { id } = req.params;
 
   try {
-    // Fetch the user object
     const user = await User.findById(id)
-      .populate('followers following', 'username profile_picture'); // Populate followers and following with basic user info
+      .populate('followers following', 'username profile_picture'); 
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -660,6 +643,7 @@ export const getDMList = async (req, res) => {
   }
 };
 
+// check email
 export const checkEmail = async (req, res) => {
   const { email } = req.body;
 
@@ -675,6 +659,7 @@ export const checkEmail = async (req, res) => {
   }
 };
 
+// check username
 export const checkUsername = async (req, res) => {
   const { username } = req.body;
 
