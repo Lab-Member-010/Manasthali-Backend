@@ -331,6 +331,7 @@ export const updateUserById = async (req, res) => {
      
 };
 
+// contact update
 export const contactUpdateById=async(req,res,next)=>{
     try {
         const { id } = req.params;
@@ -359,8 +360,9 @@ export const contactUpdateById=async(req,res,next)=>{
         console.error(error);
         res.status(500).json({ error: "Internal server error" });
       }
-}
+};
 
+// dob update
 export const DobUpdateById=async(req,res,next)=>{
     try {
         const { id } = req.params;
@@ -389,8 +391,9 @@ export const DobUpdateById=async(req,res,next)=>{
         console.error(error);
         res.status(500).json({ error: "Internal server error" });
       }
-}
+};
 
+// gender update
 export const genderUpdate=async(req,res,next)=>{
     try {
         const { id } = req.params;
@@ -421,7 +424,7 @@ export const genderUpdate=async(req,res,next)=>{
       }
 }
 
-//delete user
+// delete user
 export const deleteUserById = async (req, res) => {
     try {
         const deletedUser = await User.findOneAndDelete({ _id: req.params.id });
@@ -471,7 +474,7 @@ export const getUserFollowing = async (req, res) => {
   }
 };
 
-//
+// folllow user
 export const followUser = async (req, res) => {
     try {
       const { userId, userIdToFollow } = req.body;
@@ -504,9 +507,9 @@ export const followUser = async (req, res) => {
       console.error(error);
       res.status(500).json({ message: "Server error" });
     }
-  };
+};
 
-// //unfollow user
+// unfollow user
 export const unfollowUser = async (req, res) => {
   try {
       const { userId, userIdToUnfollow } = req.body;  // Extract IDs correctly
@@ -640,6 +643,7 @@ export const getDMList = async (req, res) => {
   }
 };
 
+// check email
 export const checkEmail = async (req, res) => {
   const { email } = req.body;
 
@@ -655,6 +659,7 @@ export const checkEmail = async (req, res) => {
   }
 };
 
+// check username
 export const checkUsername = async (req, res) => {
   const { username } = req.body;
 

@@ -5,26 +5,23 @@ import { User } from "../model/user.model.js";
 
 // Add a new comment to a post
 export const addComment = async (request, response, next) => {
-  // Logic to add a new comment
   try {
-    const { userId, comment, parent_comment_id } = request.body;
+    const { userId, comments, parent_comment_id } = request.body;
     const post_id=request.params.postId;
     const newComment = new Comment({
       post_id,
       userId,
-      comment,
+      comments,
       parent_comment_id: parent_comment_id || null,
     });
-
     await newComment.save();
 
     const post = await Post.findById(post_id);
-    post.comment_count += 1;
+    post.comments.push(newComment._id);
+    console.log(post);
     await post.save();
 
-    response
-      .status(201)
-      .json({ message: "Comment added successfully", newComment });
+    response.status(201).json({ message: "Comment added successfully", newComment });
   } catch (error) {
     console.log(error);
     response.status(500).json({ message: "Server error", error });
@@ -33,8 +30,6 @@ export const addComment = async (request, response, next) => {
 
 // Get details of a specific comment
 export const getCommentDetails = async (req, res) => {
-  // Logic to fetch comment details by ID
-
   try {
     const { id } = req.params;
     const comment = await Comment.findOne({ _id: id }).populate("user_id");
@@ -52,7 +47,6 @@ export const getCommentDetails = async (req, res) => {
 
 // Update a comment
 export const updateComment = async (req, res) => {
-  // Logic to update a comment
   try {
     const { id } = request.params;
     let updateData = request.body;
