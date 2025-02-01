@@ -1,19 +1,21 @@
-import {Message} from "../model/message.model.js"
+import { Message } from "../model/message.model.js";
 
 export const sendMessage = async (req, res) => {
   try {
-    const { receiverId, message } = req.body;
+    const { receiverId, message, audioUrl } = req.body; // Assuming 'audioUrl' will be sent if it's a voice message
     const senderId = req.user._id;
 
     // Basic validation
-    if (!receiverId || !message) {
-      return res.status(400).json({ error: "Receiver ID and message are required" });
+    if (!receiverId || (!message && !audioUrl)) {
+      return res.status(400).json({ error: "Receiver ID, message, or audio URL are required" });
     }
 
+    // Create a new message
     const newMessage = new Message({
       sender: senderId,
       receiver: receiverId,
-      message,
+      message: message || '',  // If there's a text message, store it, otherwise leave it empty
+      audioUrl: audioUrl || '', // If there's an audio message, store the URL
     });
 
     await newMessage.save();
