@@ -3,7 +3,7 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { User } from "../model/user.model.js";
-import { myOPT } from "../mailer/mymail.js"; // Your existing OTP function
+import { myOPT } from "../mailer/mymail.js";
 
 dotenv.config();
 
