@@ -1,38 +1,37 @@
 import Notification from '../model/notification.model.js';
-
+ 
 export const sendNotification=async(req,res,next)=>{
-    try {
-      const { userId, sender_id, type, content } = req.body;   
-       const notification = new Notification({ userId, sender_id, type, content });
-      const savedNotification = await notification.save();
-      res.status(200).json({ message:"Notification sent successfully", notification: savedNotification });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Error sending notification', error });
-    }
-}
-
-// Get notifications for a user
-export const getUserNotifications = async (req, res) => {
-  // Logic to fetch notifications for a user
-  const { userId } = req.params;
-  console.log('User ID:', userId);
   try {
-    const notifications = await Notification.find({ userId })
-      .sort({ createdAt: -1 }) // Latest notifications first
-      .exec();
+    const { userId, notification_type, sender_id} = req.body;
+    console.log("Notification Data:", req.body); 
 
-    if (!notifications.length) {
-      return res.status(404).json({ message: 'No notifications found for this user' });
-    }
-    res.status(200).json({ notifications });
+    const notification = new Notification({
+      userId, notification_type, sender_id,
+    });
+    await notification.save();
+    res.status(201).json(notification);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error fetching notifications', error });
+    console.error("Error creating notification:", error);
+    res.status(500).send('Error creating notification');
+  }
+}
+ 
+export const getUserNotifications = async (req, res) => {
+  try {
+    console.log("Request received:", req.params);   
+    const { userId } = req.params;  
+    console.log("Extracted userId:", userId);   
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+    const notifications = await Notification.find({sender_id:userId});
+    console.log("Fetched Notifications:", notifications);   
+    res.status(200).json(notifications);
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    res.status(500).send("Error fetching notifications");
   }
 };
-
- 
 
 // Mark a notification as read
 export const markNotificationAsRead = async (req, res) => {
