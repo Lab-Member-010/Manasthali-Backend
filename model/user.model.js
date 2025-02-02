@@ -43,7 +43,6 @@ const userSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
-    
     gender: {
       type: String,
       required: false,

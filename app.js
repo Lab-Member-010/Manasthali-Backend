@@ -6,6 +6,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from 'dotenv';
 
+import adminRouter from "./routes/Admin.route.js";
 import badgeRouter from "./routes/badge.route.js";
 import commentRouter from "./routes/comment.route.js";
 import communityRouter from "./routes/community.route.js";
@@ -42,6 +43,7 @@ mongoose.connect(process.env.DB_URI)
     console.log("Database connected...");
     
     // Add all the routes
+    app.use("/admin",adminRouter);
     app.use("/comments", commentRouter);
     app.use("/communities", communityRouter);
     app.use("/groups", groupRouter);
