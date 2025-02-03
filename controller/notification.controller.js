@@ -2,11 +2,11 @@ import Notification from '../model/notification.model.js';
  
 export const sendNotification=async(req,res,next)=>{
   try {
-    const { userId, notification_type, sender_id} = req.body;
+    const { receiver_id, notification_type, sender_id} = req.body;
     console.log("Notification Data:", req.body); 
 
     const notification = new Notification({
-      userId, notification_type, sender_id,
+      receiver_id, notification_type, sender_id,
     });
     await notification.save();
     res.status(201).json(notification);
@@ -18,20 +18,26 @@ export const sendNotification=async(req,res,next)=>{
  
 export const getUserNotifications = async (req, res) => {
   try {
-    console.log("Request received:", req.params);   
-    const { userId } = req.params;  
-    console.log("Extracted userId:", userId);   
-    if (!userId) {
-      return res.status(400).json({ message: "User ID is required" });
+  
+      console.log("🔹 Request received at /notifications/:userId");   
+      console.log("🔹 Request Params:", req.params);   
+      
+      const { userId } = req.params;  
+      console.log("Extracted userId:", userId);   
+      if (!userId) {
+        return res.status(400).json({ message: "User ID is required" });
+      }
+  
+      // Fetch notifications by receiver_id
+      const notifications = await Notification.find({ receiver_id: new mongoose.Types.ObjectId(userId) });
+  
+      console.log("Fetched Notifications:", notifications);   
+      res.status(200).json(notifications);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      res.status(500).send("Error fetching notifications");
     }
-    const notifications = await Notification.find({sender_id:userId});
-    console.log("Fetched Notifications:", notifications);   
-    res.status(200).json(notifications);
-  } catch (error) {
-    console.error("Error fetching notifications:", error);
-    res.status(500).send("Error fetching notifications");
-  }
-};
+}
 
 // Mark a notification as read
 export const markNotificationAsRead = async (req, res) => {
