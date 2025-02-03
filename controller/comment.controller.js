@@ -6,12 +6,12 @@ import { User } from "../model/user.model.js";
 // Add a new comment to a post
 export const addComment = async (request, response, next) => {
   try {
-    const { userId, comments, parent_comment_id } = request.body;
+    const { userId, comment, parent_comment_id } = request.body;
     const post_id=request.params.postId;
     const newComment = new Comment({
       post_id,
       userId,
-      comments,
+      comment,
       parent_comment_id: parent_comment_id || null,
     });
     await newComment.save();

@@ -46,7 +46,7 @@ export const getGroupsInCommunity = async (req, res) => {
 
 // Create a new community
 export const createCommunity = async (req, res) => {
-    const { name, description, icon, personality_type } = req.body;
+    const { name, description, personality_type } = req.body;
 
     if (!name) {
         return res.status(400).json({ success: false, message: "Community name is required" });
@@ -56,12 +56,9 @@ export const createCommunity = async (req, res) => {
         const newCommunity = new Community({
             name,
             description,
-            icon,
-            personality_type,
-            group_count: 0 // Initial group count
+            personality_type
         });
 
-        // Save the new community to the database
         const savedCommunity = await newCommunity.save();
         return res.status(201).json({ success: true, data: savedCommunity });
     } catch (error) {
