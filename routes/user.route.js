@@ -15,8 +15,10 @@ import {
   unfollowUser,
   verifyOtp,
   forgotPassword,
-  resetPassword,getAllUsersExceptOne,
-  getDMList
+  resetPassword,
+  getAllUsersExceptOne,
+  getDMList,
+  getCommunityUsers
 } from "../controller/user.controller.js";
 import { body } from "express-validator";
 import { auth } from "../middleware/auth.js";
@@ -61,7 +63,7 @@ router.post("/reset-password",
 router.get("/:id", auth, getUserById);
 
 //Get all user
-router.get("/get-all-users-except/:id",auth,getAllUsersExceptOne);
+router.get("/get-community-users/:id",auth,getCommunityUsers);
 
 // Update user details
 router.put("/:id", auth,upload.single("profile_picture"), updateUserById);
