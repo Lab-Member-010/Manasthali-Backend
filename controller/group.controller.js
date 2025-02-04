@@ -1,6 +1,7 @@
 import GroupMessage, { Group } from '../model/group.model.js';
 import Community from '../model/community.model.js';
 
+// create group
 export const createGroup = async (req, res) => {
   try {
     const { personality_type, name, description } = req.body;
