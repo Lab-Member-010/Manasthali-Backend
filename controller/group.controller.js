@@ -3,53 +3,28 @@ import Community from '../model/community.model.js';
 
 export const createGroup = async (req, res) => {
   try {
-    const { name, description, members, groupIcon, communityId, message } = req.body;
+    const { personality_type, name, description } = req.body;
 
-    // Check if user is authenticated (req.user is populated by the auth middleware)
-    if (!req.user) {
-      return res.status(401).json({ message: "Unauthorized" });
+    const community = await Community.findOne({ personality_type });
+    console.log(community)
+    if (!community) {
+      return res.status(404).json({ message: "Community with this personality type not found" });
     }
 
-    const createdBy = req.user.id; // Get user ID from decoded token
-
-    // Check for duplicate group name
-    const existingGroup = await Group.findOne({ name });
-    if (existingGroup) {
-      return res.status(400).json({ message: "Group with that name already exists" });
-    }
-
-    // Create the new group
     const newGroup = new Group({
-      name,
-      description,
-      created_by: createdBy,  // Set created_by to the authenticated user's ID
-      members,
-      groupIcon,  // Set groupIcon (URL or path to the icon)
-      communityId, // Add the communityId if provided
+      name: name,
+      description: description,
+      communityId: community._id,
     });
-
-    // Save the group to the database
+    console.log(newGroup)
     await newGroup.save();
 
-    // Now create the first message in the group (if a message is provided)
-    if (message) {
-      const newMessage = new GroupMessage({
-        message,
-        group: newGroup._id, // Link the message to the newly created group
-        sender: createdBy, // Set the sender as the user who created the group
-      });
-
-      // Save the group message
-      await newMessage.save();
-    }
-
-    return res.status(201).json({ message: 'Group created successfully', newGroup });
+    return res.status(201).json({ message: "Group created successfully", group: newGroup });
   } catch (error) {
-    console.error('Error creating group:', error);
-    return res.status(500).json({ message: 'Internal Server Error' });
+    console.error("Error creating group:", error);
+    return res.status(500).json({ message: "Server error" });
   }
 };
-
 
 // Get group details
 export const getGroupDetails = async (req, res) => {
@@ -183,30 +158,26 @@ export const getGroupMembers = async (req, res) => {
   }
 };
 
-
-export const getGroup = async (req, res) => {
+// get groups by personality
+export const getGroups = async (req, res) => {
   try {
-    const userId = req.user._id;  // Get the authenticated user's ID from the request object
+    const communityName = req.params.personality_type; 
 
-    // Find the groups where the user is a member
-    const groups = await Group.find({ members: { $in: [userId] } })
-      .populate('created_by', 'username profile_picture')  // Populate the creator's details
-      .populate('members', 'username profile_picture')  // Populate member details
-      .populate('messages');  // Optionally populate messages (can be optimized later)
+    const community = await Community.findOne({ personality_type: communityName });
 
-    // If no groups are found
-    if (!groups || groups.length === 0) {
-      return res.status(404).json({ message: 'No groups found for this user.' });
+    if (!community) {
+      return res.status(404).json({ message: "Community not found" });
     }
 
-    // Return the groups
-    return res.status(200).json({ groups });
-    
+    const groups = await Group.find({ communityId: community._id });
+
+    return res.status(200).json(groups);
   } catch (error) {
     console.error("Error fetching groups:", error);
-    return res.status(500).json({ message: 'Server error. Could not fetch groups.' });
+    return res.status(500).json({ message: "Server error" });
   }
 };
+
 
 export const getJoinedGroups = async (req, res) => {
   try {

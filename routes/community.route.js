@@ -7,6 +7,6 @@ router.get('/view',auth , getAllCommunities);
 router.get('/viewAll', getCommunities);
 router.get('/communities/:id',auth , getCommunityDetails);
 router.get('/communities/:id/groups',auth , getGroupsInCommunity);
-router.post('/create',auth , createCommunity);
+router.post('/create',createCommunity);
 
 export default router;

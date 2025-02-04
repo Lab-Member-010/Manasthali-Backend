@@ -6,7 +6,6 @@ const communitySchema = new mongoose.Schema({
     },
     name: { type: String, required: true, unique: true },
     description: String,
-    icon: String,
     personality_type: String,
     group_count: { type: Number, default: 0 }
 }, {
