@@ -1,12 +1,16 @@
 import Post from '../model/post.model.js';
-import Comment from '../model/comment.model.js'
-import { User } from "../model/user.model.js"; 
+import Community from '../model/community.model.js'
+import { User } from "../model/user.model.js";
+
 //Create a new post
 export const createPost = async (request, response, next) => {
   try {
-    let { userId,description } = request.body;
+    let { userId, description } = request.body;
+    const user = await User.findById({ _id: userId });
+    const community = await Community.findOne({ personality_type: user.personality_type });
+    const communityId = community._id;
     const media = request.files.map((file) => file.path);
-    let newpost = new Post({ userId,description, media });
+    let newpost = new Post({ userId, description, media, communityId });
     let savepost = await newpost.save();
     return response.status(201).json({ message: "post created successfully", savepost });
   } catch (error) {
@@ -23,7 +27,7 @@ export const getPostDetails = async (request, response, next) => {
     if (!post) {
       return response.status(404).json({ error: "post not found" });
     }
-    return response.status(201).json({ message: "post detail successfully fetched", post});
+    return response.status(201).json({ message: "post detail successfully fetched", post });
   }
   catch (error) {
     return response.status(500).json({ error: "internal server error" });
@@ -69,7 +73,7 @@ export const deletePost = async (request, response, next) => {
   }
 };
 
-  // Like Post 
+// Like Post 
 export const likePost = async (request, response) => {
   try {
     const { id } = request.params;
@@ -94,13 +98,13 @@ export const likePost = async (request, response) => {
   }
 };
 
- 
+
 export const unlikePost = async (request, response) => {
   try {
     const { id } = request.params;
     const { userId } = request.body;
     const post = await Post.findById(id);
-    
+
     if (!post) {
       return response.status(404).json({ error: "Post not found" });
     }
@@ -172,33 +176,76 @@ export const sharePost = async (req, res) => {
 
 export const getAllPosts = async (req, res) => {
   try {
-      const excludedId = req.params.id; 
-      const posts = await Post.find({ _id: { $ne: excludedId } })
-        .populate('userId', 'username profile_picture')
-        .populate('likes', 'username profile_picture')
-        .populate({
-          path: 'comments',
-          populate: {
-            path: 'userId',
-            select: 'username profilePicture',
-          }
-        })
-        .sort({ createdAt: -1 });
+    const excludedId = req.params.id;
+    const posts = await Post.find({ userId: { $ne: excludedId } })
+      .populate('userId', 'username profile_picture')
+      .populate('likes', 'username profile_picture')
+      .populate({
+        path: 'comments',
+        populate: {
+          path: 'userId',
+          select: 'username profilePicture',
+        }
+      })
+      .sort({ createdAt: -1 });
 
-      if (!posts || posts.length === 0) {
-          return res.status(404).json({
-              message: "No posts found",
-          });
-      }
-
-      return res.status(200).json({
-          posts, 
+    if (!posts || posts.length === 0) {
+      return res.status(404).json({
+        message: "No posts found",
       });
+    }
+
+    return res.status(200).json({
+      posts,
+    });
 
   } catch (error) {
-      console.error(error);
-      return res.status(500).json({
-          message: "Server error, could not retrieve posts",
+    console.error(error);
+    return res.status(500).json({
+      message: "Server error, could not retrieve posts",
+    });
+  }
+};
+
+export const getCommunityPosts = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findById({ _id: userId });
+    const community = await Community.findOne({ personality_type: user.personality_type });
+    const posts = await Post.find({ communityId: community._id })
+      .populate('userId', 'username profile_picture')
+      .populate('likes', 'username profile_picture')
+      .populate({
+        path: 'comments',
+        populate: {
+          path: 'userId',
+          select: 'username profilePicture',
+        }
       });
+
+    res.status(200).json({ posts });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ err });
+  }
+};
+
+//get user posts
+export const getUserPosts = async (req, res, next) => {
+  try{
+    const userId = req.params.id;
+    const posts = await Post.find({ userId: userId })
+      .populate('userId', 'username profile_picture')
+      .populate('likes', 'username profile_picture')
+      .populate({
+        path: 'comments',
+        populate: {
+          path: 'userId',
+          select: 'username profilePicture',
+        }
+      });
+    res.status(200).json({posts});
+  }catch(err){
+    res.status(500).json({err});
   }
 };
