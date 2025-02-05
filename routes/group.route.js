@@ -12,5 +12,6 @@ router.post('/groups/:id/join',auth, joinGroup);
 router.post('/groups/:id/leave',auth, leaveGroup);
 router.get('/groups/:id/members',auth, getGroupMembers);
 router.get("/view/joinedList",auth,getJoinedGroups);
+ 
 
 export default router;

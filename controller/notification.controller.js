@@ -5,7 +5,7 @@ export const sendNotification = async (req, res, next) => {
   try {
     const { userId, notification_type, sender_id } = req.body;
     const notification = new Notification({
-      userId, notification_type, sender_id,
+      receiver_id, notification_type, sender_id,
     });
     await notification.save();
     res.status(201).json(notification);
