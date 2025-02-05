@@ -98,7 +98,7 @@ export const likePost = async (request, response) => {
   }
 };
 
-
+// like post
 export const unlikePost = async (request, response) => {
   try {
     const { id } = request.params;
@@ -122,6 +122,7 @@ export const unlikePost = async (request, response) => {
   }
 };
 
+//unlike post
 export const getPostComments = async (req, res, next) => {
   try {
     const postId = req.params.id;
@@ -174,6 +175,7 @@ export const sharePost = async (req, res) => {
   }
 };
 
+// get all post excluding current user
 export const getAllPosts = async (req, res) => {
   try {
     const excludedId = req.params.id;
@@ -207,6 +209,7 @@ export const getAllPosts = async (req, res) => {
   }
 };
 
+// get post of all the community members
 export const getCommunityPosts = async (req, res, next) => {
   try {
     const userId = req.params.id;
@@ -230,7 +233,7 @@ export const getCommunityPosts = async (req, res, next) => {
   }
 };
 
-//get user posts
+// get user posts
 export const getUserPosts = async (req, res, next) => {
   try{
     const userId = req.params.id;
