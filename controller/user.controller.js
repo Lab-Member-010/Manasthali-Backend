@@ -98,7 +98,7 @@ export const forgotPassword = async (req, res) => {
     user.resetToken = token;
     user.resetTokenExpiry = Date.now() + 3600000;
     await user.save();
-    const resetLink = `https://manasthali-backend.onrender.com/reset-password?token=${token}`;
+    const resetLink = `https://manasthali-frontend.vercel.app/reset-password?token=${token}`;
 
     // Send reset instructions to the user's email
     const htmlContent = `
