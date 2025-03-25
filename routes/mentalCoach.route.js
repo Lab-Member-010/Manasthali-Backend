@@ -1,11 +1,8 @@
-import express from 'express';
-import { startSession, getSessionDetails, sendMessage, resolveSession } from '../controller/mentalCoach.controller.js';
+import express from "express";
+import { MentalCoach } from "../controller/mentalcoach.controller.js";
 
-const router = express.Router();
+const router=express.Router();
 
-router.post('/coach/start', startSession);
-router.get('/coach/:sessionId', getSessionDetails);
-router.post('/coach/:sessionId/send-message', sendMessage);
-router.put('/coach/:sessionId/resolve', resolveSession);
+router.post("/ask",MentalCoach);
 
 export default router;

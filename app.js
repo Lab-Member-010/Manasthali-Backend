@@ -27,7 +27,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://manasthali-frontend.vercel.app/",
+    origin: "http://localhost:3000",
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
   },
@@ -50,6 +50,7 @@ mongoose.connect(process.env.DB_URI)
     app.use("/groupchat", groupmessageRouter);
     app.use("/mentalCoach", mentalCoachRouter);
     app.use("/message", messageRouter);
+    app.use("/mental-coach", mentalCoachRouter);
     app.use("/notifications", notificationRouter);
     app.use("/posts", postRouter);
     app.use("/quiz", quizRouter);
@@ -57,6 +58,7 @@ mongoose.connect(process.env.DB_URI)
     app.use("/badges", badgeRouter);
     app.use("/users", userRouter);
     app.use("/challenge", challengesRoute);
+
 
     // Socket.IO for real-time group chat functionality
     io.on('connection', (socket) => {
