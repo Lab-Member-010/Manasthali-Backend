@@ -1,5 +1,5 @@
 import express from "express";
-import { MentalCoach } from "../controller/mentalcoach.controller.js";
+import { MentalCoach } from "../controller/mentalCoach.controller.js";
 
 const router=express.Router();
 
