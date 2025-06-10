@@ -58,7 +58,7 @@ npm install
 
 3. Run the Application:
 
-npm start
+node app.js
 
 (vii) Usage
 
